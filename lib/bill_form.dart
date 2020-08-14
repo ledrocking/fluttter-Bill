@@ -1,0 +1,121 @@
+import 'package:bill_reminder/bill_list.dart';
+import 'package:flutter/material.dart';
+import 'package:bill_reminder/database/database_helper.dart';
+import 'dart:io';
+import 'package:bill_reminder/database/bill_data_class.dart';
+import 'package:path/path.dart';
+
+const darkBlueColor = Color(0xff486579);
+
+class MyBillForm extends StatefulWidget {
+  MyBillForm({Key key, this.title}) : super(key: key);
+
+  final String title;
+
+  @override
+  _MyBillFormState createState() => _MyBillFormState();
+}
+
+class _MyBillFormState extends State<MyBillForm> {
+  int _counter = 0;
+
+  Bill _bill = Bill();
+  List<Bill> _bills = [];
+  DatabaseHelper _dbHelper;
+  final _formKey = GlobalKey<FormState>();
+  final _ctrlName = TextEditingController();
+  final _ctrlMobile = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    setState(() {
+      _dbHelper = DatabaseHelper.instance;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: Colors
+            .white, // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Center(
+          child: Text(
+            widget.title,
+            style: TextStyle(color: darkBlueColor),
+          ),
+        ),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            _form(),
+          ],
+        ),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  _form() => Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        child: Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+                TextFormField(
+                  controller: _ctrlName,
+                  decoration: InputDecoration(labelText: "Full Name"),
+                  onSaved: (val) => setState(() => _bill.name = val),
+                  validator: (val) =>
+                      (val.length == 0 ? 'This field is required' : null),
+                ),
+                TextFormField(
+                  controller: _ctrlMobile,
+                  decoration: InputDecoration(labelText: "Mobile"),
+                  onSaved: (val) => setState(() => _bill.amount = val),
+                  validator: (val) => (val.length < 5
+                      ? 'At least 5 characters required'
+                      : null),
+                ),
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  child: RaisedButton(
+                    onPressed: () => _onSubmit(),
+                    child: Text("Submit"),
+                    color: darkBlueColor,
+                    textColor: Colors.white,
+                  ),
+                ),
+              ],
+            )),
+      );
+
+  _onSubmit() async {
+    var form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+      if (_bill.id == null)
+        await _dbHelper.insertBill(_bill);
+      else
+        await _dbHelper.updateBill(_bill);
+      _resetForm();
+      Navigator.of(this.context).push(
+        MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
+      );
+    }
+  }
+
+  _resetForm() {
+    setState(() {
+      _formKey.currentState.reset();
+      _ctrlName.clear();
+      _ctrlMobile.clear();
+      _bill.id = null;
+    });
+  }
+}
