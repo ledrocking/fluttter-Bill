@@ -6,7 +6,7 @@ import 'package:path/path.dart';
 
 class DatabaseHelper {
   static const _databaseName = 'BillDatabase.db';
-  static const _databaseVersion = 1;
+  static const _databaseVersion = 2;
 
   //singleton class
   DatabaseHelper._();
@@ -33,7 +33,10 @@ class DatabaseHelper {
       CREATE TABLE ${Bill.tblBill}(
         ${Bill.colId} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Bill.colName} TEXT NOT NULL,
-        ${Bill.colAmount} TEXT NOT NULL
+        ${Bill.colAmount} TEXT NOT NULL,
+        ${Bill.colCat} TEXT NOT NULL,
+        ${Bill.colPayAmount} TEXT NOT NULL,
+        ${Bill.colDue} TEXT NOT NULL
       )
       ''');
   }

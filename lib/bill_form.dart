@@ -24,7 +24,10 @@ class _MyBillFormState extends State<MyBillForm> {
   DatabaseHelper _dbHelper;
   final _formKey = GlobalKey<FormState>();
   final _ctrlName = TextEditingController();
-  final _ctrlMobile = TextEditingController();
+  final _ctrlAmount = TextEditingController();
+  final _ctrlCat = TextEditingController();
+  final _ctrlPayAmount = TextEditingController();
+  final _ctrlDue = TextEditingController();
 
   @override
   void initState() {
@@ -75,12 +78,30 @@ class _MyBillFormState extends State<MyBillForm> {
                       (val.length == 0 ? 'This field is required' : null),
                 ),
                 TextFormField(
-                  controller: _ctrlMobile,
-                  decoration: InputDecoration(labelText: "Mobile"),
+                  controller: _ctrlAmount,
+                  decoration: InputDecoration(labelText: "Amount"),
                   onSaved: (val) => setState(() => _bill.amount = val),
-                  validator: (val) => (val.length < 5
-                      ? 'At least 5 characters required'
+                  validator: (val) => (val.length < 2
+                      ? 'At least 2 characters required'
                       : null),
+                ),
+                TextFormField(
+                  controller: _ctrlCat,
+                  decoration: InputDecoration(labelText: "Category"),
+                  onSaved: (val) => setState(() => _bill.cat = val),
+
+                ),
+                TextFormField(
+                  controller: _ctrlPayAmount,
+                  decoration: InputDecoration(labelText: "Pay Amount"),
+                  onSaved: (val) => setState(() => _bill.payAmount = val),
+
+                ),
+                TextFormField(
+                  controller: _ctrlDue,
+                  decoration: InputDecoration(labelText: "Due Date"),
+                  onSaved: (val) => setState(() => _bill.due = val),
+
                 ),
                 Container(
                   margin: EdgeInsets.all(10.0),
@@ -96,6 +117,7 @@ class _MyBillFormState extends State<MyBillForm> {
       );
 
   _onSubmit() async {
+    debugPrint('OnSubmit Func is called');
     var form = _formKey.currentState;
     if (form.validate()) {
       form.save();
@@ -114,7 +136,10 @@ class _MyBillFormState extends State<MyBillForm> {
     setState(() {
       _formKey.currentState.reset();
       _ctrlName.clear();
-      _ctrlMobile.clear();
+      _ctrlAmount.clear();
+      _ctrlCat.clear();
+      _ctrlPayAmount.clear();
+      _ctrlDue.clear();
       _bill.id = null;
     });
   }

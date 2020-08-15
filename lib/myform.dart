@@ -1,27 +1,15 @@
+import 'package:bill_reminder/bill_list.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
 import 'package:bill_reminder/database/bill_data_class.dart';
 import 'package:path/path.dart';
 
-import 'bill_list.dart';
-
-class EditForm extends StatefulWidget {
-  final String appBarTitle;
-  final Bill bill;
-
-  EditForm(this.bill, this.appBarTitle);
+const darkBlueColor = Color(0xff486579);
 
 
-  @override
-  _EditFormState createState() => _EditFormState(this.bill, this.appBarTitle);
-}
-
-class _EditFormState extends State<EditForm> {
-//  int _counter = 0;
-
-  String appBarTitle;
   Bill _bill = Bill();
+  List<Bill> _bills = [];
   DatabaseHelper _dbHelper;
   final _formKey = GlobalKey<FormState>();
   final _ctrlName = TextEditingController();
@@ -30,60 +18,8 @@ class _EditFormState extends State<EditForm> {
   final _ctrlPayAmount = TextEditingController();
   final _ctrlDue = TextEditingController();
 
-  _EditFormState(this._bill, this.appBarTitle);
 
-  @override
-  void initState() {
-    super.initState();
-    setState(() {
-      _dbHelper = DatabaseHelper.instance;
-      if (this._bill != null){
-        _ctrlName.text = _bill.name;
-        _ctrlAmount.text = _bill.amount;
-        _ctrlCat.text = _bill.cat;
-        _ctrlPayAmount.text = _bill.payAmount;
-        _ctrlDue.text = _bill.due;
-      }
-//      _ctrlName.text = _bill.name;
-//      _ctrlAmount.text = _bill.amount;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors
-            .white, // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Center(
-          child: Text(
-            widget.appBarTitle,
-            style: TextStyle(color: darkBlueColor),
-          ),
-        ),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            _form(),
-          ],
-        ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-
-
-
-  _form() => Container(
+  myForm() => Container(
     color: Colors.white,
     padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
     child: Form(
@@ -164,7 +100,3 @@ class _EditFormState extends State<EditForm> {
     });
   }
 }
-
-
-
-const darkBlueColor = Color(0xff486579);

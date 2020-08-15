@@ -85,6 +85,9 @@ class _BillDetailState extends State<BillDetail> {
                 Text("OK"),
                 Text(_bill.name),
                 Text(_bill.amount),
+                Text(_bill.cat),
+                Text(_bill.payAmount),
+                Text(_bill.due),
 
                 Container(
                   margin: EdgeInsets.all(10.0),
