@@ -6,6 +6,8 @@ import 'dart:io';
 import 'package:bill_reminder/database/bill_data_class.dart';
 import 'package:path/path.dart';
 
+import 'edit_form.dart';
+
 const darkBlueColor = Color(0xff486579);
 
 class BillList extends StatefulWidget {
@@ -20,7 +22,7 @@ class BillList extends StatefulWidget {
 class _BillListState extends State<BillList> {
   int _counter = 0;
 
-//  Bill _bill = Bill();
+  Bill _bill = Bill();
   List<Bill> _bills = [];
   DatabaseHelper _dbHelper;
 
@@ -59,6 +61,7 @@ class _BillListState extends State<BillList> {
         onPressed: () {
           debugPrint('FAB clicked');
           Navigator.of(context).push(
+//              MaterialPageRoute(builder: (context) => MyForm(title: "Add New Bill")
               MaterialPageRoute(builder: (context) => MyBillForm(title: "Add New Bill")
               ),
           );
@@ -107,15 +110,16 @@ class _BillListState extends State<BillList> {
                           _refreshBillList();
                         }),
 
-/*                    onTap: (){
+                    onTap: (){
 
                       debugPrint('One bill is clicked');
                       Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => BillDetail(_bills[index].id, _bills[index].name)
+//                        MaterialPageRoute(builder: (context) => EditForm(_bills[index], _bills[index].name)
+                        MaterialPageRoute(builder: (context) => BillDetail(_bills[index], _bills[index].name)
                         ),
                       );
 
-                    },*/
+                    },
 
                   ),
                   Divider(
