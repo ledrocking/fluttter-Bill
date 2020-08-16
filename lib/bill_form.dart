@@ -7,10 +7,12 @@ import 'package:path/path.dart';
 
 const darkBlueColor = Color(0xff486579);
 
+
 class MyBillForm extends StatefulWidget {
   MyBillForm({Key key, this.title}) : super(key: key);
 
   final String title;
+
 
   @override
   _MyBillFormState createState() => _MyBillFormState();
@@ -18,6 +20,7 @@ class MyBillForm extends StatefulWidget {
 
 class _MyBillFormState extends State<MyBillForm> {
   int _counter = 0;
+
 
   Bill _bill = Bill();
   List<Bill> _bills = [];
@@ -70,6 +73,7 @@ class _MyBillFormState extends State<MyBillForm> {
             key: _formKey,
             child: Column(
               children: <Widget>[
+
                 TextFormField(
                   controller: _ctrlName,
                   decoration: InputDecoration(labelText: "Full Name"),
@@ -77,6 +81,7 @@ class _MyBillFormState extends State<MyBillForm> {
                   validator: (val) =>
                       (val.length == 0 ? 'This field is required' : null),
                 ),
+
                 TextFormField(
                   controller: _ctrlAmount,
                   decoration: InputDecoration(labelText: "Amount"),
@@ -89,8 +94,8 @@ class _MyBillFormState extends State<MyBillForm> {
                   controller: _ctrlCat,
                   decoration: InputDecoration(labelText: "Category"),
                   onSaved: (val) => setState(() => _bill.cat = val),
-
                 ),
+
                 TextFormField(
                   controller: _ctrlPayAmount,
                   decoration: InputDecoration(labelText: "Pay Amount"),
@@ -125,7 +130,7 @@ class _MyBillFormState extends State<MyBillForm> {
         await _dbHelper.insertBill(_bill);
       else
         await _dbHelper.updateBill(_bill);
-      _resetForm();
+//      _resetForm();
       Navigator.of(this.context).push(
         MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
       );
@@ -143,4 +148,7 @@ class _MyBillFormState extends State<MyBillForm> {
       _bill.id = null;
     });
   }
+
+
+
 }

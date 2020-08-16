@@ -59,16 +59,6 @@ class DatabaseHelper {
         where: '${Bill.colId}=?', whereArgs: [id]);
   }
 
-/*
-  //bill - get
-  Future<Bill> getBill (int id) async {
-    Database db = await this.database;
-    var result = await db.query(Bill.tblBill,
-        where: '${Bill.colId}=?', whereArgs: [id]);
-    return result.fromMap();
-
-  }
-*/
 
 //bill - retrieve all
   Future<List<Bill>> fetchBills() async {

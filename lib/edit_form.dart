@@ -20,6 +20,9 @@ class EditForm extends StatefulWidget {
 class _EditFormState extends State<EditForm> {
 //  int _counter = 0;
 
+  var _myCats = ['Util', 'Education', 'Transport',];
+  var _currentItemSelected = '';
+
   String appBarTitle;
   Bill _bill = Bill();
   DatabaseHelper _dbHelper;
@@ -105,6 +108,32 @@ class _EditFormState extends State<EditForm> {
                   ? 'At least 2 characters required'
                   : null),
             ),
+
+  /*          DropdownButtonFormField<String>(
+              value: _currentItemSelected,
+              items: _myCats.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String newValueSelected) {
+                // Your code to execute, when a menu item is selected from dropdown
+                setState(() {
+                  this._currentItemSelected = newValueSelected;
+                  _bill.cat = _currentItemSelected;
+                });
+              },
+
+              onSaved: (String newValueSelected) {
+                // Your code to execute, when a menu item is selected from dropdown
+                setState(() {
+                  _bill.cat = _currentItemSelected;
+                });
+              },
+
+            ),
+*/
             TextFormField(
               controller: _ctrlCat,
               decoration: InputDecoration(labelText: "Category"),
@@ -163,6 +192,7 @@ class _EditFormState extends State<EditForm> {
       _bill.id = null;
     });
   }
+
 }
 
 

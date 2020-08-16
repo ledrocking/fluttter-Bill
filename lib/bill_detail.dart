@@ -82,10 +82,10 @@ class _BillDetailState extends State<BillDetail> {
             key: _formKey,
             child: Column(
               children: <Widget>[
-                Text("OK"),
+                Text(_bill.id.toString()),
                 Text(_bill.name),
                 Text(_bill.amount),
-                Text(_bill.cat),
+                Text(_bill.cat.toString()),
                 Text(_bill.payAmount),
                 Text(_bill.due),
 

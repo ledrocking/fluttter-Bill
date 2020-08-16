@@ -7,6 +7,7 @@ import 'package:bill_reminder/database/bill_data_class.dart';
 import 'package:path/path.dart';
 
 import 'edit_form.dart';
+import 'myform.dart';
 
 const darkBlueColor = Color(0xff486579);
 
@@ -61,7 +62,8 @@ class _BillListState extends State<BillList> {
         onPressed: () {
           debugPrint('FAB clicked');
           Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => MyBillForm(title: "Add New Bill")
+              MaterialPageRoute(builder: (context) => MyForm(title: "Add New Bill")
+ //             MaterialPageRoute(builder: (context) => MyBillForm(title: "Add New Bill")
               ),
           );
 
