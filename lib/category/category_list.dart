@@ -1,42 +1,35 @@
-import 'package:bill_reminder/bill_detail.dart';
-import 'package:bill_reminder/bill_form.dart';
+
 
 import 'package:flutter/material.dart';
-import 'package:bill_reminder/database/database_helper.dart';
-import 'dart:io';
-import 'package:bill_reminder/database/bill_data_class.dart';
-import 'package:path/path.dart';
-
-import 'category/category_form.dart';
-import 'category/category_list.dart';
-import 'edit_form.dart';
-import 'myform.dart';
+import 'category_class.dart';
+import 'cat_db_helper.dart';
+import 'package:bill_reminder/myform.dart';
+import 'category_form.dart';
 
 const darkBlueColor = Color(0xff486579);
 
-class BillList extends StatefulWidget {
-  BillList({Key key, this.title}) : super(key: key);
+class MyCategoryList extends StatefulWidget {
+  MyCategoryList({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _BillListState createState() => _BillListState();
+  _MyCategoryListState createState() => _MyCategoryListState();
 }
 
-class _BillListState extends State<BillList> {
-  int _counter = 0;
-
-  Bill _bill = Bill();
-  List<Bill> _bills = [];
-  DatabaseHelper _dbHelper;
+class _MyCategoryListState extends State<MyCategoryList> {
+  MyCategory _myCategory = MyCategory();
+  List<MyCategory> _myCategories = [];
+  CatDBHelper _catDBHelper;
+  List<String> myCatList = [];
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      _dbHelper = DatabaseHelper.instance;
+      _catDBHelper = CatDBHelper.instance;
     });
-    _refreshBillList();
+    _refreshMyCategoryList();
   }
 
   @override
@@ -54,55 +47,47 @@ class _BillListState extends State<BillList> {
           ),
         ),
       ),
-
       body: Center(
-
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          children:
-            <Widget>[_list()],
-
-
+          children: <Widget>[_list()],
         ),
-
-
-
       ),
-
 
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           debugPrint('FAB clicked');
           Navigator.of(context).push(
-//              MaterialPageRoute(builder: (context) => MyCategoryForm(title: "Add New Category")
-              MaterialPageRoute(builder: (context) => MyForm(title: "Add New Bill")
+            MaterialPageRoute(
+                builder: (context) => MyCategoryForm(title: "Add New MyCategory")
 
-          // MaterialPageRoute(builder: (context) => MyBillForm(title: "Add New Bill")
-              ),
+                // MaterialPageRoute(builder: (context) => MyMyCategoryForm(title: "Add New MyCategory")
+                ),
           );
         },
-
-        tooltip: 'Add Bill',
-
+        tooltip: 'Add MyCategory',
         child: Icon(Icons.add),
-
-      ),
-
-      // This trailing comma makes auto-formatting nicer for build methods.
+      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
 
-
-
-
-  _refreshBillList() async {
-    List<Bill> x = await _dbHelper.fetchBills();
+  _refreshMyCategoryList() async {
+    List<MyCategory> x = await _catDBHelper.fetchMyCategories();
     setState(() {
-      _bills = x;
+      _myCategories = x;
     });
-  }
+    _myCategories.forEach((element) {
+      debugPrint(element.name);
+      myCatList.add(element.name);
+    });
+    myCatList.forEach((element) {
+      int i = 1;
+      debugPrint('Cat $i is: $element');
+      i++;
+    });
 
+  }
 
   _list() => Expanded(
         child: Card(
@@ -116,45 +101,29 @@ class _BillListState extends State<BillList> {
                     leading: Icon(Icons.account_circle,
                         color: darkBlueColor, size: 40.0),
                     title: Text(
-                      _bills[index].name.toUpperCase(),
+                      _myCategories[index].name.toUpperCase(),
                       style: TextStyle(
                         color: darkBlueColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    subtitle: Text(_bills[index].amount),
+
                     trailing: IconButton(
                         icon: Icon(Icons.delete_sweep, color: darkBlueColor),
                         onPressed: () async {
-                          await _dbHelper.deleteBill(_bills[index].id);
-                          _refreshBillList();
+                          await _catDBHelper.deleteMyCategory(_myCategories[index].id);
+                          _refreshMyCategoryList();
                         }),
-
-                    onTap: (){
-
-                      debugPrint('One bill is clicked');
-                      Navigator.of(context).push(
-//                        MaterialPageRoute(builder: (context) => EditForm(_bills[index], _bills[index].name)
-                        MaterialPageRoute(builder: (context) => BillDetail(_bills[index], _bills[index].name)
-                        ),
-                      );
-
-                    },
-
-
 
                   ),
                   Divider(
                     height: 5.0,
                   )
-
                 ],
               );
             },
-            itemCount: _bills.length,
+            itemCount: _myCategories.length,
           ),
         ),
-
       );
-
 }

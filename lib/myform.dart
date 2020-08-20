@@ -4,10 +4,13 @@ import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
 import 'package:bill_reminder/database/bill_data_class.dart';
 import 'package:intl/intl.dart';
+import 'package:bill_reminder/category/cat_db_helper.dart';
 
+import 'category/cat_db_helper.dart';
+import 'category/category_class.dart';
+import 'category/getCategoryList.dart';
 
 const darkBlueColor = Color(0xff486579);
-
 
 class MyForm extends StatefulWidget {
   MyForm({Key key, this.title}) : super(key: key);
@@ -19,15 +22,15 @@ class MyForm extends StatefulWidget {
 }
 
 class _MyFormState extends State<MyForm> {
+  GetCategoryList _getCategoryList = GetCategoryList();
 
-  var _myCats = ['Util', 'Education', 'Transport',];
-  var _currentItemSelected = '';
-
-
+  MyCategory _myCategory = MyCategory();
+  List<MyCategory> _myCategories = [];
 
   Bill _bill = Bill();
   List<Bill> _bills = [];
   DatabaseHelper _dbHelper;
+  CatDBHelper _catDBHelper;
   final _formKey = GlobalKey<FormState>();
   final _ctrlName = TextEditingController();
   final _ctrlAmount = TextEditingController();
@@ -36,18 +39,37 @@ class _MyFormState extends State<MyForm> {
   final _ctrlPayAmount = TextEditingController();
   final _ctrlDue = TextEditingController();
 
-  
-
+//  List<String> _myCats = [];
+  var _myCats = [
+    'Util',
+    'Education',
+    'Transport',
+  ];
+  var _currentItemSelected = '';
+/*
+  void getCat() async{
+    final catList = await _getCategoryList.getList();
+    setState(() {
+      _myCats = catList;
+    });
+    _myCats.forEach((element) {
+      int i = 1;
+      debugPrint('Cat $i is: $element');
+      i++;
+    });
+  }*/
 
   @override
-  void initState() {
+  initState() {
     super.initState();
-    _currentItemSelected = _myCats[0];
     setState(() {
       _dbHelper = DatabaseHelper.instance;
+      _catDBHelper = CatDBHelper.instance;
+//      getCat();
     });
-  }
 
+    _currentItemSelected = _myCats[0];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,22 +98,21 @@ class _MyFormState extends State<MyForm> {
   }
 
   _form() => Expanded(
-    child: Container(
-      color: Colors.white,
-      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-      child: Form(
-          key: _formKey,
+        child: Container(
+          color: Colors.white,
+          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+
+          child: Form(
+            key: _formKey,
             child: Column(
               children: <Widget>[
-
                 TextFormField(
                   controller: _ctrlName,
                   decoration: InputDecoration(labelText: "Full Name"),
                   onSaved: (val) => setState(() => _bill.name = val),
                   validator: (val) =>
-                  (val.length == 0 ? 'This field is required' : null),
+                      (val.length == 0 ? 'This field is required' : null),
                 ),
-
                 TextFormField(
                   controller: _ctrlAmount,
                   decoration: InputDecoration(labelText: "Amount"),
@@ -100,7 +121,6 @@ class _MyFormState extends State<MyForm> {
                       ? 'At least 2 characters required'
                       : null),
                 ),
-
                 DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: "Category"),
                   value: _currentItemSelected,
@@ -117,37 +137,34 @@ class _MyFormState extends State<MyForm> {
                       _bill.cat = _currentItemSelected;
                     });
                   },
-
                   onSaved: (String newValueSelected) {
                     // Your code to execute, when a menu item is selected from dropdown
                     setState(() {
                       _bill.cat = _currentItemSelected;
                     });
                   },
-
                 ),
-
                 TextFormField(
                   controller: _ctrlPayAmount,
                   decoration: InputDecoration(labelText: "Pay Amount"),
                   onSaved: (val) => setState(() => _bill.payAmount = val),
-
                 ),
-
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Container(
                       margin: EdgeInsets.all(10.0),
-                      child: RaisedButton(onPressed: () => _selectDate(context),
+                      child: RaisedButton(
+                        onPressed: () => _selectDate(context),
                         child: Text("Pick Date"),
                         color: darkBlueColor,
                         textColor: Colors.white,
                       ),
-                    ), Container(
+                    ),
+                    Container(
                       margin: EdgeInsets.all(10.0),
-                      child: RaisedButton(onPressed: () => _selectTime(context),
+                      child: RaisedButton(
+                        onPressed: () => _selectTime(context),
                         child: Text("Pick Time"),
                         color: darkBlueColor,
                         textColor: Colors.white,
@@ -155,14 +172,11 @@ class _MyFormState extends State<MyForm> {
                     ),
                   ],
                 ),
-
                 TextFormField(
                   controller: _ctrlDue,
                   decoration: InputDecoration(labelText: "Due Date"),
-
                   onSaved: (val) => setState(() => _bill.due = val),
                 ),
-
                 Container(
                   margin: EdgeInsets.all(10.0),
                   child: RaisedButton(
@@ -175,11 +189,12 @@ class _MyFormState extends State<MyForm> {
               ],
             ),
           ),
-    ),
-  );
+        ),
+      );
 
   _onSubmit() async {
     debugPrint('OnSubmit Func is called');
+
     var form = _formKey.currentState;
     if (form.validate()) {
       form.save();
@@ -206,39 +221,36 @@ class _MyFormState extends State<MyForm> {
     });
   }
 
-
   DateTime _date = new DateTime.now();
   TimeOfDay _time = new TimeOfDay.now();
   var formattedDate = "";
   var formattedTime = "";
 
-
-Future<Null> _selectDate(BuildContext context) async {
-  final DateTime picked = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: new DateTime(2018),
-      lastDate: new DateTime(2024)
-  );
-  if(picked != null && picked != _date) {
-    print('Date selected : ${_date.toString()}');
-    setState(() {
-      _date = picked;
-    });
+  Future<Null> _selectDate(BuildContext context) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: _date,
+        firstDate: new DateTime(2018),
+        lastDate: new DateTime(2024));
+    if (picked != null && picked != _date) {
+      print('Date selected : ${_date.toString()}');
+      setState(() {
+        _date = picked;
+      });
 //    String formattedDate = DateFormat('dd-MMM-yyy – kk:mm').format(_date);
-    formattedDate = DateFormat('dd-MMM-yyy').format(_date);
-    debugPrint("$formattedDate");
-    _ctrlDue.text = formattedDate;
-    return formattedDate;
+      formattedDate = DateFormat('dd-MMM-yyy').format(_date);
+      debugPrint("$formattedDate");
+      _ctrlDue.text = formattedDate;
+      return formattedDate;
+    }
   }
-}
 
   Future<Null> _selectTime(BuildContext context) async {
     final TimeOfDay picked = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay(hour: 10, minute: 00),
+      context: context,
+      initialTime: TimeOfDay(hour: 10, minute: 00),
     );
-    if(picked != null && picked != _time) {
+    if (picked != null && picked != _time) {
       print('Time selected : ${_time.toString()}');
       setState(() {
         _time = picked;
@@ -249,7 +261,3 @@ Future<Null> _selectDate(BuildContext context) async {
     }
   }
 }
-
-
-
-
