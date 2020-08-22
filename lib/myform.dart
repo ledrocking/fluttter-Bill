@@ -4,10 +4,10 @@ import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
 import 'package:bill_reminder/database/bill_data_class.dart';
 import 'package:intl/intl.dart';
-import 'package:bill_reminder/category/cat_db_helper.dart';
 
-import 'category/cat_db_helper.dart';
+
 import 'category/category_class.dart';
+import 'category/category_list.dart';
 import 'category/getCategoryList.dart';
 
 const darkBlueColor = Color(0xff486579);
@@ -22,7 +22,7 @@ class MyForm extends StatefulWidget {
 }
 
 class _MyFormState extends State<MyForm> {
-  GetCategoryList _getCategoryList = GetCategoryList();
+
 
   MyCategory _myCategory = MyCategory();
   List<MyCategory> _myCategories = [];
@@ -30,7 +30,6 @@ class _MyFormState extends State<MyForm> {
   Bill _bill = Bill();
   List<Bill> _bills = [];
   DatabaseHelper _dbHelper;
-  CatDBHelper _catDBHelper;
   final _formKey = GlobalKey<FormState>();
   final _ctrlName = TextEditingController();
   final _ctrlAmount = TextEditingController();
@@ -39,36 +38,29 @@ class _MyFormState extends State<MyForm> {
   final _ctrlPayAmount = TextEditingController();
   final _ctrlDue = TextEditingController();
 
-//  List<String> _myCats = [];
-  var _myCats = [
+
+  List<String> _myCats = [];
+/*  var _myCats = [
     'Util',
     'Education',
     'Transport',
-  ];
+  ];*/
   var _currentItemSelected = '';
-/*
-  void getCat() async{
-    final catList = await _getCategoryList.getList();
-    setState(() {
-      _myCats = catList;
-    });
-    _myCats.forEach((element) {
-      int i = 1;
-      debugPrint('Cat $i is: $element');
-      i++;
-    });
-  }*/
+
+  GetCategoryList _getCategoryList = GetCategoryList();
+  int i = 1;
+
 
   @override
   initState() {
     super.initState();
+
     setState(() {
       _dbHelper = DatabaseHelper.instance;
-      _catDBHelper = CatDBHelper.instance;
-//      getCat();
-    });
+      _refreshMyCategoryList();
+//      _myCats= _myCatList;
 
-    _currentItemSelected = _myCats[0];
+    });
   }
 
   @override
@@ -86,111 +78,123 @@ class _MyFormState extends State<MyForm> {
           ),
         ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+      body: Container(
+        child: ListView(
+//          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             _form(),
           ],
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+      // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  _form() => Expanded(
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+  _form() => Container(
+    color: Colors.white,
+    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
 
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: <Widget>[
-                TextFormField(
-                  controller: _ctrlName,
-                  decoration: InputDecoration(labelText: "Full Name"),
-                  onSaved: (val) => setState(() => _bill.name = val),
-                  validator: (val) =>
-                      (val.length == 0 ? 'This field is required' : null),
+    child: Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          TextFormField(
+            controller: _ctrlName,
+            decoration: InputDecoration(labelText: "Full Name"),
+            onSaved: (val) => setState(() => _bill.name = val),
+            validator: (val) =>
+            (val.length == 0 ? 'This field is required' : null),
+          ),
+          TextFormField(
+            controller: _ctrlAmount,
+            decoration: InputDecoration(labelText: "Amount"),
+            onSaved: (val) => setState(() => _bill.amount = val),
+            validator: (val) => (val.length < 2
+                ? 'At least 2 characters required'
+                : null),
+          ),
+          DropdownButtonFormField<String>(
+
+            decoration: InputDecoration(labelText: "Category"),
+//            value: _currentItemSelected,
+            items: _myCats.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+
+            }).toList(),
+            onChanged: (String newValueSelected) {
+              // Your code to execute, when a menu item is selected from dropdown
+              setState(() {
+                this._currentItemSelected = newValueSelected;
+                _bill.cat = _currentItemSelected;
+              });
+            },
+            onSaved: (String newValueSelected) {
+              // Your code to execute, when a menu item is selected from dropdown
+              setState(() {
+                _bill.cat = _currentItemSelected;
+              });
+            },
+          ),
+          TextFormField(
+            controller: _ctrlPayAmount,
+            decoration: InputDecoration(labelText: "Pay Amount"),
+            onSaved: (val) => setState(() => _bill.payAmount = val),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: RaisedButton(
+                  onPressed: () => _selectDate(context),
+                  child: Text("Pick Date"),
+                  color: darkBlueColor,
+                  textColor: Colors.white,
                 ),
-                TextFormField(
-                  controller: _ctrlAmount,
-                  decoration: InputDecoration(labelText: "Amount"),
-                  onSaved: (val) => setState(() => _bill.amount = val),
-                  validator: (val) => (val.length < 2
-                      ? 'At least 2 characters required'
-                      : null),
+              ),
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: RaisedButton(
+                  onPressed: () => _selectTime(context),
+                  child: Text("Pick Time"),
+                  color: darkBlueColor,
+                  textColor: Colors.white,
                 ),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(labelText: "Category"),
-                  value: _currentItemSelected,
-                  items: _myCats.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (String newValueSelected) {
-                    // Your code to execute, when a menu item is selected from dropdown
-                    setState(() {
-                      this._currentItemSelected = newValueSelected;
-                      _bill.cat = _currentItemSelected;
-                    });
-                  },
-                  onSaved: (String newValueSelected) {
-                    // Your code to execute, when a menu item is selected from dropdown
-                    setState(() {
-                      _bill.cat = _currentItemSelected;
-                    });
-                  },
-                ),
-                TextFormField(
-                  controller: _ctrlPayAmount,
-                  decoration: InputDecoration(labelText: "Pay Amount"),
-                  onSaved: (val) => setState(() => _bill.payAmount = val),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: RaisedButton(
-                        onPressed: () => _selectDate(context),
-                        child: Text("Pick Date"),
-                        color: darkBlueColor,
-                        textColor: Colors.white,
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.all(10.0),
-                      child: RaisedButton(
-                        onPressed: () => _selectTime(context),
-                        child: Text("Pick Time"),
-                        color: darkBlueColor,
-                        textColor: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-                TextFormField(
-                  controller: _ctrlDue,
-                  decoration: InputDecoration(labelText: "Due Date"),
-                  onSaved: (val) => setState(() => _bill.due = val),
-                ),
-                Container(
-                  margin: EdgeInsets.all(10.0),
-                  child: RaisedButton(
-                    onPressed: () => _onSubmit(),
-                    child: Text("Submit"),
-                    color: darkBlueColor,
-                    textColor: Colors.white,
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          TextFormField(
+            controller: _ctrlDue,
+            decoration: InputDecoration(labelText: "Due Date"),
+            onSaved: (val) => setState(() => _bill.due = val),
+          ),
+          Container(
+            margin: EdgeInsets.all(10.0),
+            child: RaisedButton(
+              onPressed: () => _onSubmit(),
+              child: Text("Submit"),
+              color: darkBlueColor,
+              textColor: Colors.white,
             ),
           ),
-        ),
-      );
+          Container(
+            margin: EdgeInsets.all(10.0),
+            child: RaisedButton(
+              onPressed: () {
+                Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
+              },
+              child: Text("Add Category"),
+              color: darkBlueColor,
+              textColor: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 
   _onSubmit() async {
     debugPrint('OnSubmit Func is called');
@@ -259,5 +263,32 @@ class _MyFormState extends State<MyForm> {
       debugPrint("$formattedTime");
       _ctrlDue.text = formattedDate + " " + formattedTime;
     }
+  }
+
+  List<String> _myCatList = [];
+
+  _refreshMyCategoryList() async {
+    List<MyCategory> x = await _dbHelper.fetchMyCategories();
+    setState(() {
+      _myCategories = x;
+    });
+    int i = 1;
+    _myCategories.forEach((element) {
+      debugPrint(element.name);
+      _myCatList.add('$i ' + element.name);
+      _myCats.add(element.name);
+      i++;
+    });
+    debugPrint('This is from refresh myCats');
+    int catNo = 1;
+
+    _myCats.forEach((element) {
+      debugPrint('Cat No $catNo: $element');
+      catNo++;
+    });
+    debugPrint('This is from refresh myCatList');
+    _myCatList.forEach((element) {
+      debugPrint('Cat is: $element');
+    });
   }
 }

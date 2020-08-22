@@ -2,9 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'category_class.dart';
-import 'cat_db_helper.dart';
 import 'package:bill_reminder/myform.dart';
 import 'category_form.dart';
+import 'package:bill_reminder/database/database_helper.dart';
 
 const darkBlueColor = Color(0xff486579);
 
@@ -20,16 +20,17 @@ class MyCategoryList extends StatefulWidget {
 class _MyCategoryListState extends State<MyCategoryList> {
   MyCategory _myCategory = MyCategory();
   List<MyCategory> _myCategories = [];
-  CatDBHelper _catDBHelper;
+  DatabaseHelper _databaseHelper;
   List<String> myCatList = [];
 
   @override
   void initState() {
     super.initState();
     setState(() {
-      _catDBHelper = CatDBHelper.instance;
+      _databaseHelper = DatabaseHelper.instance;
+      _refreshMyCategoryList();
     });
-    _refreshMyCategoryList();
+
   }
 
   @override
@@ -71,23 +72,24 @@ class _MyCategoryListState extends State<MyCategoryList> {
     );
   }
 
-
   _refreshMyCategoryList() async {
-    List<MyCategory> x = await _catDBHelper.fetchMyCategories();
+    List<MyCategory> x = await _databaseHelper.fetchMyCategories();
     setState(() {
       _myCategories = x;
-    });
-    _myCategories.forEach((element) {
-      debugPrint(element.name);
-      myCatList.add(element.name);
-    });
-    myCatList.forEach((element) {
-      int i = 1;
-      debugPrint('Cat $i is: $element');
-      i++;
+      _myCategories.forEach((element) {
+        debugPrint(element.name);
+        myCatList.add(element.name);
+      });
+      myCatList.forEach((element) {
+        int i = 1;
+        debugPrint('Cat $i is: $element');
+        i++;
+      });
     });
 
+
   }
+
 
   _list() => Expanded(
         child: Card(
@@ -111,7 +113,7 @@ class _MyCategoryListState extends State<MyCategoryList> {
                     trailing: IconButton(
                         icon: Icon(Icons.delete_sweep, color: darkBlueColor),
                         onPressed: () async {
-                          await _catDBHelper.deleteMyCategory(_myCategories[index].id);
+                          await _databaseHelper.deleteMyCategory(_myCategories[index].id);
                           _refreshMyCategoryList();
                         }),
 
@@ -126,4 +128,7 @@ class _MyCategoryListState extends State<MyCategoryList> {
           ),
         ),
       );
+
+
+
 }

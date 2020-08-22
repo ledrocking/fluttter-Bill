@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'cat_db_helper.dart';
 import 'dart:io';
 import 'category_class.dart';
 import 'category_list.dart';
+import 'package:bill_reminder/database/database_helper.dart';
 
 const darkBlueColor = Color(0xff486579);
 
@@ -20,7 +20,7 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
 
   MyCategory _myCategory = MyCategory();
   List<MyCategory> _myCategories = [];
-  CatDBHelper _catDBHelper;
+  DatabaseHelper _databaseHelper;
   final _formKey = GlobalKey<FormState>();
   final _ctrlName = TextEditingController();
 
@@ -28,7 +28,7 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
   void initState() {
     super.initState();
     setState(() {
-      _catDBHelper = CatDBHelper.instance;
+      _databaseHelper = DatabaseHelper.instance;
     });
   }
 
@@ -97,9 +97,9 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
     if (form.validate()) {
       form.save();
       if (_myCategory.id == null)
-        await _catDBHelper.insertMyCategory(_myCategory);
+        await _databaseHelper.insertMyCategory(_myCategory);
       else
-        await _catDBHelper.updateMyCategory(_myCategory);
+        await _databaseHelper.updateMyCategory(_myCategory);
 //      _resetForm();
       Navigator.of(this.context).push(
         MaterialPageRoute(
@@ -109,7 +109,7 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
   }
 
   Future<List<MyCategory>>getList() async {
-    List<MyCategory> xCat = await _catDBHelper.fetchMyCategories();
+    List<MyCategory> xCat = await _databaseHelper.fetchMyCategories();
     debugPrint('My Cat List is:  ${xCat.toString()}');
     return xCat;
   }

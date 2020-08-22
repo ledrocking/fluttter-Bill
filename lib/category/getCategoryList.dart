@@ -1,41 +1,28 @@
 
-
 import 'package:flutter/material.dart';
 import 'category_class.dart';
-import 'cat_db_helper.dart';
+import 'package:bill_reminder/database/database_helper.dart';
 
 class GetCategoryList {
   MyCategory _myCategory = MyCategory();
   List<MyCategory> _myCategories = [];
-  CatDBHelper _catDBHelper;
+  DatabaseHelper _dbHelper;
   List<String> myCatList = [];
-  List<String> myGetList = [];
-
-  getList(){
-    myGetList = getCatList() as List<String>;
-    return myGetList;
-  }
-
-/*  getList(){
-    getCatList().then((value) => myGetList);
-  }*/
 
 
-  Future<List> getCatList() async {
-    List<MyCategory> x = await _catDBHelper.fetchMyCategories();
+
+  Future<List> createCatList() async {
+    debugPrint('GetCategoryList createCatList() is called');
+    List<MyCategory> x = await _dbHelper.fetchMyCategories();
     _myCategories = x;
+    int i = 1;
 
     _myCategories.forEach((element) {
       debugPrint(element.name);
       myCatList.add(element.name);
     });
-    myCatList.forEach((element) {
-      int i = 1;
-      debugPrint('Cat $i is: $element');
-      i++;
-    });
 
-    return myCatList.toList();
+    return myCatList;
   }
 }
 
