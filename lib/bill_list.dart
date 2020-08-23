@@ -45,7 +45,7 @@ class _BillListState extends State<BillList> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors
-            .white, // Here we take the value from the MyHomePage object that was created by
+            .lightBlueAccent, // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Center(
           child: Text(
@@ -55,6 +55,9 @@ class _BillListState extends State<BillList> {
         ),
       ),
 
+      drawer: new Drawer(
+        child: menuList(context),
+      ),
       body: Center(
 
         child: Column(
@@ -156,5 +159,62 @@ class _BillListState extends State<BillList> {
         ),
 
       );
+  
+  Widget menuList(context) {
+    return ListView(
+      children: [
+        ListTile(
+          leading: Icon(Icons.account_circle,
+              color: darkBlueColor, size: 40.0),
+          title: Text("Home",
+            style: TextStyle(
+              color: darkBlueColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          onTap: (){
+
+            debugPrint('One bill is clicked');
+            Navigator.of(this.context).push(
+              MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
+            );
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.account_circle,
+              color: darkBlueColor, size: 40.0),
+          title: Text("Bill List",
+            style: TextStyle(
+              color: darkBlueColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          onTap: (){
+
+            debugPrint('One bill is clicked');
+            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
+          },
+        ),
+        ListTile(
+          leading: Icon(Icons.account_circle,
+              color: darkBlueColor, size: 40.0),
+          title: Text("Category",
+            style: TextStyle(
+              color: darkBlueColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          onTap: (){
+
+            debugPrint('One bill is clicked');
+            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
+          },
+        ),
+      ],
+    );
+  }
 
 }

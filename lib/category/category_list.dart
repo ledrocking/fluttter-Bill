@@ -39,7 +39,7 @@ class _MyCategoryListState extends State<MyCategoryList> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors
-            .white, // Here we take the value from the MyHomePage object that was created by
+            .lightBlue, // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Center(
           child: Text(

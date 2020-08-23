@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 
 import 'category/category_class.dart';
 import 'category/category_list.dart';
-import 'category/getCategoryList.dart';
+
 
 const darkBlueColor = Color(0xff486579);
 
@@ -47,7 +47,6 @@ class _MyFormState extends State<MyForm> {
   ];*/
   var _currentItemSelected = '';
 
-  GetCategoryList _getCategoryList = GetCategoryList();
   int i = 1;
 
 
