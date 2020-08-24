@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:bill_reminder/category/category_class.dart';
+import 'package:bill_reminder/bill/bill_data_class.dart';
 
-import 'bill_data_class.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -35,19 +35,22 @@ class DatabaseHelper {
       CREATE TABLE ${Bill.tblBill}(
         ${Bill.colId} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Bill.colName} TEXT NOT NULL,
-        ${Bill.colAmount} TEXT NOT NULL,
         ${Bill.colCat} TEXT NOT NULL,
-        ${Bill.colPayAmount} TEXT NOT NULL,
-        ${Bill.colDue} TEXT NOT NULL
+        ${Bill.colEndDate} TEXT NOT NULL,
+        ${Bill.colPeriodic} TEXT NOT NULL,
+        ${Bill.colStartDate} TEXT NOT NULL,
+        ${Bill.colBillIcon} TEXT
       )
-            ''');
+      '''
+    );
+
     await db.execute('''
       CREATE TABLE ${MyCategory.tblCategory}(
       ${MyCategory.colId} INTEGER PRIMARY KEY AUTOINCREMENT,
       ${MyCategory.colName} TEXT NOT NULL
       )
-      
-      ''');
+      '''
+    );
   }
 
 

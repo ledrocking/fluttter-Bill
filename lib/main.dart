@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'my_home.dart';
-import 'bill_form.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:sqflite/sqflite.dart';
-import 'bill_list.dart';
+import 'bill/bill_list.dart';
 
 void main() {
   runApp(MyApp());

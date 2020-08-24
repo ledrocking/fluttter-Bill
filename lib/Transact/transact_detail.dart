@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
-import 'package:bill_reminder/database/bill_data_class.dart';
+import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_data_class.dart';
 import 'package:path/path.dart';
 
-import 'bill_list.dart';
+import 'transact_list.dart';
 import 'edit_form.dart';
 
 class BillDetail extends StatefulWidget {

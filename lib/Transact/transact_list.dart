@@ -1,16 +1,16 @@
-import 'package:bill_reminder/bill_detail.dart';
+import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_detail.dart';
 import 'package:bill_reminder/bill_form.dart';
 
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
-import 'package:bill_reminder/database/bill_data_class.dart';
+import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_data_class.dart';
 import 'package:path/path.dart';
 
 import 'category/category_form.dart';
 import 'category/category_list.dart';
 import 'edit_form.dart';
-import 'myform.dart';
+import 'transact_form.dart';
 
 const darkBlueColor = Color(0xff486579);
 
@@ -45,7 +45,7 @@ class _BillListState extends State<BillList> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors
-            .lightBlueAccent, // Here we take the value from the MyHomePage object that was created by
+            .white, // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Center(
           child: Text(
@@ -55,9 +55,6 @@ class _BillListState extends State<BillList> {
         ),
       ),
 
-      drawer: new Drawer(
-        child: menuList(context),
-      ),
       body: Center(
 
         child: Column(
@@ -159,62 +156,5 @@ class _BillListState extends State<BillList> {
         ),
 
       );
-  
-  Widget menuList(context) {
-    return ListView(
-      children: [
-        ListTile(
-          leading: Icon(Icons.account_circle,
-              color: darkBlueColor, size: 40.0),
-          title: Text("Home",
-            style: TextStyle(
-              color: darkBlueColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          onTap: (){
-
-            debugPrint('One bill is clicked');
-            Navigator.of(this.context).push(
-              MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
-            );
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.account_circle,
-              color: darkBlueColor, size: 40.0),
-          title: Text("Bill List",
-            style: TextStyle(
-              color: darkBlueColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          onTap: (){
-
-            debugPrint('One bill is clicked');
-            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
-          },
-        ),
-        ListTile(
-          leading: Icon(Icons.account_circle,
-              color: darkBlueColor, size: 40.0),
-          title: Text("Category",
-            style: TextStyle(
-              color: darkBlueColor,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-
-          onTap: (){
-
-            debugPrint('One bill is clicked');
-            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
-          },
-        ),
-      ],
-    );
-  }
 
 }

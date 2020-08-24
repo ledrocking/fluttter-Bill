@@ -1,8 +1,8 @@
-import 'package:bill_reminder/bill_list.dart';
+import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_list.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
-import 'package:bill_reminder/database/bill_data_class.dart';
+import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_data_class.dart';
 import 'package:intl/intl.dart';
 
 
@@ -273,9 +273,9 @@ class _MyFormState extends State<MyForm> {
     });
     int i = 1;
     _myCategories.forEach((element) {
-      debugPrint(element.name);
-      _myCatList.add('$i ' + element.name);
-      _myCats.add(element.name);
+      debugPrint(element.payDate);
+      _myCatList.add('$i ' + element.payDate);
+      _myCats.add(element.payDate);
       i++;
     });
     debugPrint('This is from refresh myCats');
