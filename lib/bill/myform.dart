@@ -31,6 +31,8 @@ class _MyFormState extends State<MyForm> {
   MyCategory _myCategory = MyCategory();
   List<MyCategory> _myCategories = [];
 
+
+
   Bill _bill = Bill();
   List<Bill> _bills = [];
   DatabaseHelper _dbHelper;
@@ -46,9 +48,11 @@ class _MyFormState extends State<MyForm> {
 
 
 
-
+  List<String> _listPeriodic = ["Monthly", "BiWeekly", "Weekly", "No Repeat"];
   List<String> _myCats = [];
   var _currentItemSelected = '';
+  var _currentPeriodicSelected = '';
+
 
   int i = 1;
 
@@ -91,6 +95,23 @@ class _MyFormState extends State<MyForm> {
       ),
       // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  _onSubmit() async {
+    debugPrint('OnSubmit Func is called');
+
+    var form = _formKey.currentState;
+    if (form.validate()) {
+      form.save();
+      if (_bill.id == null)
+        await _dbHelper.insertBill(_bill);
+      else
+        await _dbHelper.updateBill(_bill);
+//      _resetForm();
+      Navigator.of(this.context).push(
+        MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
+      );
+    }
   }
 
   _form() => Container(
@@ -160,7 +181,9 @@ class _MyFormState extends State<MyForm> {
                 flex: 7,
                 child: TextFormField(
                   controller: _ctrlStartDate,
+                  readOnly: true,
                   decoration: InputDecoration(labelText: "Start Date"),
+                  onTap: () => _selectDate(this.context, 1),
                   onSaved: (val) => setState(() => _bill.startDate = val),
                 ),
               ),
@@ -175,14 +198,34 @@ class _MyFormState extends State<MyForm> {
             ],
           ),
 
-          TextFormField(
-            controller: _ctrlPeriodic,
-            decoration: InputDecoration(labelText: "Periodic"),
-            onSaved: (val) => setState(() => _bill.periodic = val),
-            validator: (val) => (val.length < 2
-                ? 'At least 2 characters required'
-                : null),
+          Container(
+            child: DropdownButtonFormField<String>(
+
+              decoration: InputDecoration(labelText: "Periodic"),
+//            value: _currentPeriodicSelected,
+              items: _listPeriodic.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String newValueSelected) {
+                // Your code to execute, when a menu item is selected from dropdown
+                setState(() {
+                  this._currentPeriodicSelected = newValueSelected;
+                  _bill.periodic = _currentPeriodicSelected;
+                });
+              },
+              onSaved: (String newValueSelected) {
+                // Your code to execute, when a menu item is selected from dropdown
+                setState(() {
+                  _bill.periodic = _currentPeriodicSelected;
+                });
+              },
+            ),
           ),
+
+
 
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -190,8 +233,10 @@ class _MyFormState extends State<MyForm> {
               Flexible(
                 flex: 7,
                 child: TextFormField(
+                  readOnly: true,
                   controller: _ctrlEndDate,
-                  decoration: InputDecoration(labelText: "End Date"),
+                  decoration: InputDecoration(labelText: "End Date", hintText: "Click icon on the right"),
+                  onTap: () => _selectDate(this.context, 2),
                   onSaved: (val) => setState(() => _bill.endDate = val),
                 ),
               ),
@@ -212,14 +257,32 @@ class _MyFormState extends State<MyForm> {
             onSaved: (val) => setState(() => _bill.billIcon = val),
           ),
 
-          Container(
-            margin: EdgeInsets.all(10.0),
-            child: RaisedButton(
-              onPressed: () => _onSubmit(),
-              child: Text("Submit"),
-              color: darkBlueColor,
-              textColor: Colors.white,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: RaisedButton(
+                  onPressed: () {
+                    Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => BillList(title: "Home")));
+                  },
+
+                  child: Text("Cancel"),
+                  color: darkBlueColor,
+                  textColor: Colors.white,
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.all(10.0),
+                child: RaisedButton(
+                  onPressed: () => _onSubmit(),
+                  child: Text("Submit"),
+                  color: darkBlueColor,
+                  textColor: Colors.white,
+                ),
+              ),
+
+            ],
           ),
 
         ],
@@ -227,31 +290,15 @@ class _MyFormState extends State<MyForm> {
     ),
   );
 
-  _onSubmit() async {
-    debugPrint('OnSubmit Func is called');
-
-    var form = _formKey.currentState;
-    if (form.validate()) {
-      form.save();
-      if (_bill.id == null)
-        await _dbHelper.insertBill(_bill);
-      else
-        await _dbHelper.updateBill(_bill);
-//      _resetForm();
-      Navigator.of(this.context).push(
-        MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
-      );
-    }
-  }
-
   _resetForm() {
     setState(() {
       _formKey.currentState.reset();
       _ctrlName.clear();
-      _ctrlPeriodic.clear();
       _ctrlCat.clear();
-      _ctrlEndDate.clear();
       _ctrlStartDate.clear();
+      _ctrlPeriodic.clear();
+      _ctrlEndDate.clear();
+      _ctrlBillIcon.clear();
       _bill.id = null;
     });
   }

@@ -1,16 +1,13 @@
-import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_detail.dart';
-import 'package:bill_reminder/bill_form.dart';
-
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
 import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_data_class.dart';
 import 'package:path/path.dart';
 
-import 'category/category_form.dart';
-import 'category/category_list.dart';
 import 'edit_form.dart';
 import 'transact_form.dart';
+
+import 'transact_class.dart';
 
 const darkBlueColor = Color(0xff486579);
 

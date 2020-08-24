@@ -1,6 +1,6 @@
-class Bill {
+class Transact {
 
-  static const tabTransact = 'transact';
+  static const tblTransact = 'transact';
   static const colTID = 'tID';
   static const colBillID = 'billID';
   static const colDueDate = 'dueDate';
@@ -11,7 +11,7 @@ class Bill {
   static const colPayImage = 'payImage';
 
 
-  Bill({int myID, this.tID, this.billID, this.dueDate, this.dueAmount, this.payDate, this.payAmount, this.payNote, this.payImage});
+  Transact({int myID, this.tID, this.billID, this.dueDate, this.dueAmount, this.payDate, this.payAmount, this.payNote, this.payImage});
 
   int tID;
   int billID;
@@ -23,7 +23,7 @@ class Bill {
   String payImage;
 
 
-  Bill.fromMap(Map<String, dynamic> map) {
+  Transact.fromMap(Map<String, dynamic> map) {
     tID = map[colTID];
     billID = map[colBillID];
     dueDate = map[colDueDate];
