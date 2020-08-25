@@ -1,18 +1,20 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 
 import 'package:bill_reminder/bill/bill_data_class.dart';
 import 'package:bill_reminder/bill/bill_list.dart';
 
-
 import 'package:bill_reminder/category/category_list.dart';
 import 'package:bill_reminder/category/category_class.dart';
-import 'package:bill_reminder/database/database_helper.dart';
-import 'package:path/path.dart';
 
+import 'package:bill_reminder/Transact/transact_class.dart';
+
+import 'package:bill_reminder/database/database_helper.dart';
+
+import 'package:path/path.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
-
-
 
 const darkBlueColor = Color(0xff486579);
 
@@ -27,21 +29,23 @@ class MyForm extends StatefulWidget {
 
 class _MyFormState extends State<MyForm> {
 
+  Bill _bill = Bill();
+  List<Bill> _bills = [];
 
   MyCategory _myCategory = MyCategory();
   List<MyCategory> _myCategories = [];
 
+  Transact _transact = Transact();
 
 
-  Bill _bill = Bill();
-  List<Bill> _bills = [];
   DatabaseHelper _dbHelper;
   final _formKey = GlobalKey<FormState>();
   final _ctrlName = TextEditingController();
   final _ctrlCat = TextEditingController();
   final _ctrlStartDate = TextEditingController();
-  final _ctrlEndDate = TextEditingController();
+  final _ctrlAmount = TextEditingController();
   final _ctrlPeriodic = TextEditingController();
+  final _ctrlEndDate = TextEditingController();
   final _ctrlBillIcon = TextEditingController();
 
   final _ctrlMyCat = TextEditingController();
@@ -100,19 +104,46 @@ class _MyFormState extends State<MyForm> {
   _onSubmit() async {
     debugPrint('OnSubmit Func is called');
 
+    //Insert data into  Table
     var form = _formKey.currentState;
+    int insertedID;
+
+
+
+
+
     if (form.validate()) {
       form.save();
-      if (_bill.id == null)
-        await _dbHelper.insertBill(_bill);
-      else
+      if (_bill.id == null){
+
+        // Insert data into Bill Table and return last inserted rowID
+        insertedID = await _dbHelper.insertBill2(_bill);
+        debugPrint("Insert ID Captured is : $insertedID"); //
+        //OK       await _dbHelper.insertBill2(_bill); // Insert data into Bill Table
+
+        //Insert data into Transact Table
+        _transact.billID = insertedID;
+        _transact.dueDate = _bill.startDate;
+        _transact.dueAmount = _bill.amount;
+        _transact.status = "Unpaid";
+        await _dbHelper.insertTransact(_transact);
+        debugPrint("Data is inserted into Transact Table");
+
+      }
+
+      else {
         await _dbHelper.updateBill(_bill);
-//      _resetForm();
+      }
+
+
+      //Navigate to Bill List
       Navigator.of(this.context).push(
         MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
       );
     }
   }
+
+
 
   _form() => Container(
     color: Colors.white,
@@ -121,6 +152,7 @@ class _MyFormState extends State<MyForm> {
       key: _formKey,
       child: Column(
         children: <Widget>[
+          //TextFormField for Bill Name
           TextFormField(
             controller: _ctrlName,
             decoration: InputDecoration(labelText: "Full Name"),
@@ -129,6 +161,7 @@ class _MyFormState extends State<MyForm> {
             (val.length == 0 ? 'This field is required' : null),
           ),
 
+          //TextFormField for Bill Category
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -174,6 +207,7 @@ class _MyFormState extends State<MyForm> {
             ],
           ),
 
+          //TextFormField for Bill startDate
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -198,6 +232,15 @@ class _MyFormState extends State<MyForm> {
             ],
           ),
 
+          //TextFormField for Bill Amount
+          TextFormField(
+            controller: _ctrlAmount,
+            decoration: InputDecoration(labelText: "Amount"),
+            onSaved: (val) => setState(() => _bill.amount = double.parse(_ctrlAmount.text) as double),
+          ),
+
+
+          //TextFormField for Bill Periodic
           Container(
             child: DropdownButtonFormField<String>(
 
@@ -225,8 +268,7 @@ class _MyFormState extends State<MyForm> {
             ),
           ),
 
-
-
+          //TextFormField for Bill endDate
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -251,12 +293,14 @@ class _MyFormState extends State<MyForm> {
             ],
           ),
 
+          //TextFormField for Bill Icon
           TextFormField(
             controller: _ctrlBillIcon,
             decoration: InputDecoration(labelText: "Bill Icon"),
             onSaved: (val) => setState(() => _bill.billIcon = val),
           ),
 
+          //Button for Submit & Cancel
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -290,12 +334,15 @@ class _MyFormState extends State<MyForm> {
     ),
   );
 
+
+  //Form Reset
   _resetForm() {
     setState(() {
       _formKey.currentState.reset();
       _ctrlName.clear();
       _ctrlCat.clear();
       _ctrlStartDate.clear();
+      _ctrlAmount.clear();
       _ctrlPeriodic.clear();
       _ctrlEndDate.clear();
       _ctrlBillIcon.clear();
@@ -304,7 +351,7 @@ class _MyFormState extends State<MyForm> {
   }
 
 
-
+//Date Picker
   DateTime _date = new DateTime.now();
   TimeOfDay _time = new TimeOfDay.now();
   var formattedDate = "";

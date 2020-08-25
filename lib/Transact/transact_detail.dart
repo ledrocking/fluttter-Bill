@@ -1,3 +1,5 @@
+import 'package:bill_reminder/Transact/transact_class.dart';
+import 'package:bill_reminder/Transact/transact_update.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
@@ -5,32 +7,31 @@ import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill
 import 'package:path/path.dart';
 
 import 'transact_list.dart';
-import 'edit_form.dart';
 
-class BillDetail extends StatefulWidget {
+class TransactDetail extends StatefulWidget {
   final String appBarTitle;
-  final Bill bill;
+  final Transact transact;
 
-  BillDetail(this.bill, this.appBarTitle);
+  TransactDetail(this.transact, this.appBarTitle);
 
 /*  @override
   State<StatefulWidget> createState() {
-    return _BillDetailState(this.bill, this.appBarTitle);*/
+    return _TransactDetailState(this.transact, this.appBarTitle);*/
 
     @override
-  _BillDetailState createState() => _BillDetailState(this.bill, this.appBarTitle);
+  _TransactDetailState createState() => _TransactDetailState(this.transact, this.appBarTitle);
 }
 
-class _BillDetailState extends State<BillDetail> {
+class _TransactDetailState extends State<TransactDetail> {
 //  int _counter = 0;
 
   String appBarTitle;
-  Bill _bill = Bill();
+  Transact _transact = Transact();
   DatabaseHelper _dbHelper;
   final _formKey = GlobalKey<FormState>();
 
 
-  _BillDetailState(this._bill, this.appBarTitle);
+  _TransactDetailState(this._transact, this.appBarTitle);
 
   @override
   void initState() {
@@ -53,7 +54,7 @@ class _BillDetailState extends State<BillDetail> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors
-            .white, // Here we take the value from the MyHomePage object that was created by
+            .lightBlue, // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Center(
           child: Text(
@@ -82,12 +83,11 @@ class _BillDetailState extends State<BillDetail> {
             key: _formKey,
             child: Column(
               children: <Widget>[
-                Text(_bill.id.toString()),
-                Text(_bill.name),
-                Text(_bill.amount),
-                Text(_bill.cat.toString()),
-                Text(_bill.payAmount),
-                Text(_bill.due),
+                Text(_transact.tID.toString()),
+                Text(_transact.billID.toString()),
+                Text(_transact.dueDate),
+                Text(_transact.dueAmount.toString()),
+                Text(_transact.status),
 
                 Container(
                   margin: EdgeInsets.all(10.0),
@@ -104,10 +104,10 @@ class _BillDetailState extends State<BillDetail> {
 
   _onSubmit()  {
 /*      Navigator.of(this.context).push(
-        MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),*/
+        MaterialPageRoute(builder: (context) => TransactList(title: "Transact List")),*/
 
       Navigator.of(this.context).push(
-          MaterialPageRoute(builder: (context) => EditForm(_bill, _bill.name)),
+          MaterialPageRoute(builder: (context) => TransactUpdate(_transact, _transact.tID.toString())),
       );
     }
   }

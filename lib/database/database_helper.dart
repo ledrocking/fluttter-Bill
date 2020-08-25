@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:bill_reminder/category/category_class.dart';
 import 'package:bill_reminder/bill/bill_data_class.dart';
 import 'package:bill_reminder/Transact/transact_class.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -37,9 +38,10 @@ class DatabaseHelper {
         ${Bill.colId} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Bill.colName} TEXT NOT NULL,
         ${Bill.colCat} TEXT NOT NULL,
-        ${Bill.colEndDate} TEXT NOT NULL,
-        ${Bill.colPeriodic} TEXT NOT NULL,
         ${Bill.colStartDate} TEXT NOT NULL,
+        ${Bill.colAmount} REAL,
+        ${Bill.colPeriodic} TEXT,
+        ${Bill.colEndDate} TEXT,
         ${Bill.colBillIcon} TEXT
       )
       '''
@@ -49,7 +51,8 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE ${MyCategory.tblCategory}(
       ${MyCategory.colId} INTEGER PRIMARY KEY AUTOINCREMENT,
-      ${MyCategory.colName} TEXT NOT NULL
+      ${MyCategory.colName} TEXT NOT NULL,
+      ${MyCategory.colIcon} TEXT
       )
       '''
     );
@@ -60,11 +63,12 @@ class DatabaseHelper {
         ${Transact.colTID} INTEGER PRIMARY KEY AUTOINCREMENT,
         ${Transact.colBillID} INTEGER NOT NULL,
         ${Transact.colDueDate} TEXT NOT NULL,
-        ${Transact.colDueAmount} DOUBLE,
+        ${Transact.colDueAmount} REAL,
         ${Transact.colPayDate} TEXT,
-        ${Transact.colPayAmount} DOUBLE,
+        ${Transact.colPayAmount} REAL,
         ${Transact.colPayNote} TEXT,
-        ${Transact.colPayImage} TEXT
+        ${Transact.colPayImage} TEXT,
+        ${Transact.colStatus} TEXT
       )
       '''
     );
@@ -76,6 +80,14 @@ class DatabaseHelper {
   Future<int> insertBill(Bill bill) async {
     Database db = await database;
     return await db.insert(Bill.tblBill, bill.toMap());
+  }
+
+  Future<int> insertBill2(Bill bill) async {
+    Database db = await database;
+    int insertedId = await db.insert(Bill.tblBill, bill.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,);
+    debugPrint('inserted ID : $insertedId');
+    return insertedId;
   }
 
   //bill - update
@@ -98,6 +110,7 @@ class DatabaseHelper {
     List<Map> bills = await db.query(Bill.tblBill);
     return bills.length == 0 ? [] : bills.map((x) => Bill.fromMap(x)).toList();
   }
+
 
   //--------------------------------------------------------------------------
   //CRUD MyCategory TABLE

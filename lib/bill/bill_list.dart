@@ -1,8 +1,9 @@
+import 'package:bill_reminder/Transact/transact_list.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bill_reminder/bill/bill_data_class.dart';
 import 'package:bill_reminder/bill/bill_detail.dart';
-import 'package:bill_reminder/bill/myform.dart';
+import 'package:bill_reminder/bill/bill_form.dart';
 
 import 'package:bill_reminder/category/category_list.dart';
 import 'package:bill_reminder/database/database_helper.dart';
@@ -156,7 +157,7 @@ class _BillListState extends State<BillList> {
         ),
 
       );
-  
+
   Widget menuList(context) {
     return ListView(
       children: [
@@ -172,7 +173,7 @@ class _BillListState extends State<BillList> {
 
           onTap: (){
 
-            debugPrint('One bill is clicked');
+            debugPrint('Home Menu is clicked');
             Navigator.of(this.context).push(
               MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
             );
@@ -181,7 +182,7 @@ class _BillListState extends State<BillList> {
         ListTile(
           leading: Icon(Icons.account_circle,
               color: darkBlueColor, size: 40.0),
-          title: Text("Bill List",
+          title: Text("Transaction List",
             style: TextStyle(
               color: darkBlueColor,
               fontWeight: FontWeight.bold,
@@ -190,8 +191,8 @@ class _BillListState extends State<BillList> {
 
           onTap: (){
 
-            debugPrint('One bill is clicked');
-            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
+            debugPrint('Transaction Menu is clicked');
+            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => TransactList(title: "Transaction List")));
           },
         ),
         ListTile(
@@ -206,7 +207,7 @@ class _BillListState extends State<BillList> {
 
           onTap: (){
 
-            debugPrint('One bill is clicked');
+            debugPrint('Category Menu is Clicked');
             Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
           },
         ),

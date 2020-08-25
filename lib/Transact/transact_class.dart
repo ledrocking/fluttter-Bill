@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 class Transact {
 
   static const tblTransact = 'transact';
@@ -9,6 +11,7 @@ class Transact {
   static const colPayAmount = 'payAmount';
   static const colPayNote = 'payNote';
   static const colPayImage = 'payImage';
+  static const colStatus = 'status';
 
 
   Transact({int myID, this.tID, this.billID, this.dueDate, this.dueAmount, this.payDate, this.payAmount, this.payNote, this.payImage});
@@ -16,11 +19,12 @@ class Transact {
   int tID;
   int billID;
   String dueDate;
-  String dueAmount;
+  double dueAmount;
   String payDate;
-  String payAmount;
+  double payAmount;
   String payNote;
   String payImage;
+  String status;
 
 
   Transact.fromMap(Map<String, dynamic> map) {
@@ -32,6 +36,7 @@ class Transact {
     payAmount = map[colPayAmount];
     payNote = map[colPayNote];
     payImage = map[colPayImage];
+    status = map[colStatus];
 
   }
 
@@ -44,6 +49,7 @@ class Transact {
       colPayAmount: payAmount,
       colPayNote: payNote,
       colPayImage: payImage,
+      colStatus: status,
     };
     if (tID != null) {
       map[colTID] = tID;

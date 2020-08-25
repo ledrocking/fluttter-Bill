@@ -1,30 +1,30 @@
+import 'package:bill_reminder/Transact/transact_detail.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
 import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_data_class.dart';
 import 'package:path/path.dart';
 
-import 'edit_form.dart';
-import 'transact_form.dart';
+import 'transact_update.dart';
 
 import 'transact_class.dart';
 
 const darkBlueColor = Color(0xff486579);
 
-class BillList extends StatefulWidget {
-  BillList({Key key, this.title}) : super(key: key);
+class TransactList extends StatefulWidget {
+  TransactList({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _BillListState createState() => _BillListState();
+  _TransactListState createState() => _TransactListState();
 }
 
-class _BillListState extends State<BillList> {
+class _TransactListState extends State<TransactList> {
   int _counter = 0;
 
-  Bill _bill = Bill();
-  List<Bill> _bills = [];
+  Transact _transact = Transact();
+  List<Transact> _transacts = [];
   DatabaseHelper _dbHelper;
 
   @override
@@ -33,7 +33,7 @@ class _BillListState extends State<BillList> {
     setState(() {
       _dbHelper = DatabaseHelper.instance;
     });
-    _refreshBillList();
+    _refreshTransactList();
   }
 
   @override
@@ -42,7 +42,7 @@ class _BillListState extends State<BillList> {
       backgroundColor: Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Colors
-            .white, // Here we take the value from the MyHomePage object that was created by
+            .lightBlue, // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Center(
           child: Text(
@@ -58,45 +58,18 @@ class _BillListState extends State<BillList> {
           mainAxisAlignment: MainAxisAlignment.start,
           children:
             <Widget>[_list()],
-
-
         ),
-
-
-
       ),
 
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          debugPrint('FAB clicked');
-          Navigator.of(context).push(
-//              MaterialPageRoute(builder: (context) => MyCategoryForm(title: "Add New Category")
-              MaterialPageRoute(builder: (context) => MyForm(title: "Add New Bill")
-
-          // MaterialPageRoute(builder: (context) => MyBillForm(title: "Add New Bill")
-              ),
-          );
-        },
-
-        tooltip: 'Add Bill',
-
-        child: Icon(Icons.add),
-
-      ),
 
       // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-
-
-
-
-  _refreshBillList() async {
-    List<Bill> x = await _dbHelper.fetchBills();
+  _refreshTransactList() async {
+    List<Transact> x = await _dbHelper.fetchTransacts();
     setState(() {
-      _bills = x;
+      _transacts = x;
     });
   }
 
@@ -113,32 +86,30 @@ class _BillListState extends State<BillList> {
                     leading: Icon(Icons.account_circle,
                         color: darkBlueColor, size: 40.0),
                     title: Text(
-                      _bills[index].name.toUpperCase(),
+                      _transacts[index].tID.toString(),
                       style: TextStyle(
                         color: darkBlueColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    subtitle: Text(_bills[index].amount),
+                    subtitle: Text(_transacts[index].dueAmount.toString()),
                     trailing: IconButton(
                         icon: Icon(Icons.delete_sweep, color: darkBlueColor),
                         onPressed: () async {
-                          await _dbHelper.deleteBill(_bills[index].id);
-                          _refreshBillList();
+                          await _dbHelper.deleteTransact(_transacts[index].tID);
+                          _refreshTransactList();
                         }),
 
                     onTap: (){
 
-                      debugPrint('One bill is clicked');
+                      debugPrint('One transact is clicked');
                       Navigator.of(context).push(
-//                        MaterialPageRoute(builder: (context) => EditForm(_bills[index], _bills[index].name)
-                        MaterialPageRoute(builder: (context) => BillDetail(_bills[index], _bills[index].name)
+//                        MaterialPageRoute(builder: (context) => EditForm(_transacts[index], _transacts[index].name)
+                        MaterialPageRoute(builder: (context) => TransactDetail(_transacts[index], _transacts[index].tID.toString())
                         ),
                       );
 
                     },
-
-
 
                   ),
                   Divider(
@@ -148,7 +119,7 @@ class _BillListState extends State<BillList> {
                 ],
               );
             },
-            itemCount: _bills.length,
+            itemCount: _transacts.length,
           ),
         ),
 
