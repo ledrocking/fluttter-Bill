@@ -1,5 +1,7 @@
 import 'dart:ffi';
 
+import 'package:bill_reminder/bill/bill_data_class.dart';
+
 class Transact {
 
   static const tblTransact = 'transact';
@@ -14,7 +16,9 @@ class Transact {
   static const colStatus = 'status';
 
 
-  Transact({int myID, this.tID, this.billID, this.dueDate, this.dueAmount, this.payDate, this.payAmount, this.payNote, this.payImage});
+  Transact({int myID, this.tID, this.billID, this.dueDate, this.dueAmount,
+    this.payDate, this.payAmount, this.payNote, this.payImage,
+  this.status});
 
   int tID;
   int billID;
@@ -25,7 +29,8 @@ class Transact {
   String payNote;
   String payImage;
   String status;
-
+  String billName;
+  String billCat;
 
   Transact.fromMap(Map<String, dynamic> map) {
     tID = map[colTID];
@@ -37,6 +42,8 @@ class Transact {
     payNote = map[colPayNote];
     payImage = map[colPayImage];
     status = map[colStatus];
+    billName = map[Bill.colName];
+    billCat = map[Bill.colCat];
 
   }
 
@@ -50,6 +57,7 @@ class Transact {
       colPayNote: payNote,
       colPayImage: payImage,
       colStatus: status,
+
     };
     if (tID != null) {
       map[colTID] = tID;

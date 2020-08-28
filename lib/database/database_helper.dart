@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:bill_reminder/Transact/transbill_class.dart';
 
 class DatabaseHelper {
   static const _databaseName = 'BillDatabase.db';
@@ -75,6 +76,9 @@ class DatabaseHelper {
 
   }
 
+
+
+
   // CRUD BILL TABLE
   //bill - insert
   Future<int> insertBill(Bill bill) async {
@@ -108,6 +112,14 @@ class DatabaseHelper {
   Future<List<Bill>> fetchBills() async {
     Database db = await database;
     List<Map> bills = await db.query(Bill.tblBill);
+    return bills.length == 0 ? [] : bills.map((x) => Bill.fromMap(x)).toList();
+  }
+
+
+  //bill - retrieve specific Bill
+  Future<List<Bill>> fetch1Bill(int id) async {
+    Database db = await database;
+    List<Map> bills = await db.query(Bill.tblBill, where: '${Bill.colId}=?', whereArgs: [id]);
     return bills.length == 0 ? [] : bills.map((x) => Bill.fromMap(x)).toList();
   }
 
@@ -173,4 +185,34 @@ class DatabaseHelper {
         ? []
         : transacts.map((x) => Transact.fromMap(x)).toList();
   }
+
+//_____________________________________________________________________________
+
+  //EXPERIMENT
+
+  // SELECT JOIN TABLE TRANSACT & BILL
+  Future<List<Transact>> fetchJoin() async {
+    Database db = await database;
+
+    List<Map> transacts  = await db.rawQuery(
+        '''
+        SELECT ${Transact.colTID}, ${Transact.colDueDate}, ${Transact.colDueAmount},
+        ${Transact.colPayDate}, ${Transact.colPayAmount}, ${Transact.colPayNote},
+        ${Transact.colPayImage}, ${Transact.colStatus}, ${Bill.colName},  ${Bill.colCat}
+        FROM ${Transact.tblTransact} 
+        INNER JOIN ${Bill.tblBill}
+        ON ${Bill.colId} = ${Transact.colBillID}
+       '''
+    );
+    List<Transact> myList = transacts.length == 0
+    ? [] : transacts.map((x) => Transact.fromMap(x)).toList();
+
+    if (myList ==null){
+      debugPrint("No Data from join");
+    }
+    debugPrint(myList[1].billName);
+    debugPrint(myList[1].dueAmount.toString());
+
+    return myList;
+    }
 }

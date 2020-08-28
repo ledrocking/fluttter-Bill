@@ -1,3 +1,4 @@
+import 'package:bill_reminder/Transact/transList.dart';
 import 'package:bill_reminder/Transact/transact_list.dart';
 import 'package:flutter/material.dart';
 
@@ -192,7 +193,24 @@ class _BillListState extends State<BillList> {
           onTap: (){
 
             debugPrint('Transaction Menu is clicked');
-            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => TransactList(title: "Transaction List")));
+            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => TransList(title: "TransList")));
+          },
+        ),
+
+        ListTile(
+          leading: Icon(Icons.account_circle,
+              color: darkBlueColor, size: 40.0),
+          title: Text("Tester Translist",
+            style: TextStyle(
+              color: darkBlueColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          onTap: (){
+
+            debugPrint('Transaction Menu is clicked');
+            Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => TransList(title: "TransList")));
           },
         ),
         ListTile(
