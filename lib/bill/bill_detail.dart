@@ -6,6 +6,8 @@ import 'package:bill_reminder/bill/edit_form.dart';
 
 import 'package:path/path.dart';
 
+import 'NavDrawer.dart';
+
 
 class BillDetail extends StatefulWidget {
   final String appBarTitle;
@@ -57,6 +59,7 @@ class _BillDetailState extends State<BillDetail> {
           ),
         ),
       ),
+      drawer: NavDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

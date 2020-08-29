@@ -3,6 +3,7 @@ import 'package:bill_reminder/category/category_class.dart';
 import 'package:bill_reminder/bill/bill_data_class.dart';
 import 'package:bill_reminder/Transact/transact_class.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -109,9 +110,25 @@ class DatabaseHelper {
   }
 
   //bill - retrieve all
-  Future<List<Bill>> fetchBills() async {
+/*  Future<List<Bill>> fetchBills() async {
     Database db = await database;
     List<Map> bills = await db.query(Bill.tblBill);
+    return bills.length == 0 ? [] : bills.map((x) => Bill.fromMap(x)).toList();
+  }*/
+
+//         WHERE ${DateTime.parse(Bill.colStartDate)} < ${DateTime.now()}
+  //ok            WHERE ${(Bill.colAmount)} < 500
+  //ok         WHERE ${DateTime.parse(Bill.colStartDate)} < ${DateTime.now()}
+
+
+  //bill - retrieve all
+  Future<List<Bill>> fetchBills() async {
+    Database db = await database;
+    List<Map> bills = await db.rawQuery(
+        '''
+        SELECT * FROM ${Bill.tblBill}        
+        '''
+    );
     return bills.length == 0 ? [] : bills.map((x) => Bill.fromMap(x)).toList();
   }
 
@@ -189,29 +206,41 @@ class DatabaseHelper {
 //_____________________________________________________________________________
 
   //EXPERIMENT
+//      WHERE DateFormat('yM').format(DateTime.parse(${Transact.colDueDate})) = ${DateFormat('yM').format(DateTime.parse(DateTime.now()))}
+//  WHERE DateFormat('yM').format(DateTime.parse(${Transact.colDueDate})) = DateFormat('yM').format(DateTime.parse(${DateTime.now()}))
+//ok        WHERE ${Transact.colDueAmount} < 1000
+//ok               AND ${DateTime.parse(Transact.colDueDate)} < ${DateTime.now()}
+  //         > ${DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()))}
+  //        WHERE  "2020-08-01" < DateTime.parse(DateTime.now().toString())
 
-  // SELECT JOIN TABLE TRANSACT & BILL
-  Future<List<Transact>> fetchJoin() async {
+// SELECT JOIN TABLE TRANSACT & BILL
+  Future<List<TransBill>> fetchJoin() async {
     Database db = await database;
+    String _date = '2020-10-29';
+ //   String _date = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
 
-    List<Map> transacts  = await db.rawQuery(
+    List<Map> transBills  = await db.rawQuery(
         '''
-        SELECT ${Transact.colTID}, ${Transact.colDueDate}, ${Transact.colDueAmount},
+        SELECT ${TransBill.colTID}, ${TransBill.colBillID}, ${Transact.colDueDate}, ${Transact.colDueAmount},
         ${Transact.colPayDate}, ${Transact.colPayAmount}, ${Transact.colPayNote},
         ${Transact.colPayImage}, ${Transact.colStatus}, ${Bill.colName},  ${Bill.colCat}
         FROM ${Transact.tblTransact} 
         INNER JOIN ${Bill.tblBill}
-        ON ${Bill.colId} = ${Transact.colBillID}
-       '''
+        ON ${Bill.colId} = ${Transact.colBillID} 
+        WHERE ${Transact.colDueDate} < "$_date"
+        '''
     );
-    List<Transact> myList = transacts.length == 0
-    ? [] : transacts.map((x) => Transact.fromMap(x)).toList();
+
+    List<TransBill> myList = transBills.length == 0
+    ? [] : transBills.map((x) => TransBill.fromMap(x)).toList();
 
     if (myList ==null){
       debugPrint("No Data from join");
     }
-    debugPrint(myList[1].billName);
-    debugPrint(myList[1].dueAmount.toString());
+
+    debugPrint("var _date : $_date");
+    debugPrint("Original Now     : ${DateTime.now()}");
+    debugPrint("Not formatted : ${(myList[1].dueDate)}");
 
     return myList;
     }

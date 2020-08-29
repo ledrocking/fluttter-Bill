@@ -1,5 +1,4 @@
 import 'package:bill_reminder/Transact/transList.dart';
-import 'package:bill_reminder/Transact/transact_list.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bill_reminder/bill/bill_data_class.dart';
@@ -8,7 +7,10 @@ import 'package:bill_reminder/bill/bill_form.dart';
 
 import 'package:bill_reminder/category/category_list.dart';
 import 'package:bill_reminder/database/database_helper.dart';
+import 'package:intl/intl.dart';
 import 'package:path/path.dart';
+
+import 'NavDrawer.dart';
 
 
 const darkBlueColor = Color(0xff486579);
@@ -54,9 +56,7 @@ class _BillListState extends State<BillList> {
         ),
       ),
 
-      drawer: new Drawer(
-        child: menuList(context),
-      ),
+      drawer: NavDrawer(),
       body: Center(
 
         child: Column(
@@ -124,7 +124,16 @@ class _BillListState extends State<BillList> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    subtitle: Text(_bills[index].periodic),
+                    subtitle: Wrap(
+                      children: [
+/*                        Text(DateTime.parse(_bills[index].startDate).toString()),
+                        Text("Due : ${DateFormat('dd-MMM-yyy').format(DateTime.parse(_bills[index].startDate))},  "),
+                        Text("Due : ${DateFormat('dd-MMM-yyy').format(DateTime.now())},  "),*/
+
+                        Text("Due : ${DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(_bills[index].startDate))},  "),
+                        Text("Amount : ${_bills[index].amount.toString()}"),
+                      ],
+                    ),
                     trailing: IconButton(
                         icon: Icon(Icons.delete_sweep, color: darkBlueColor),
                         onPressed: () async {

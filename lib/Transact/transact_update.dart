@@ -1,4 +1,7 @@
-import 'package:bill_reminder/Transact/transact_list.dart';
+
+import 'package:bill_reminder/Transact/transList.dart';
+import 'package:bill_reminder/Transact/transbill_class.dart';
+import 'package:bill_reminder/bill/NavDrawer.dart';
 import 'package:bill_reminder/category/category_class.dart';
 import 'package:bill_reminder/category/category_list.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +19,7 @@ const darkBlueColor = Color(0xff486579);
 
 class TransactUpdate extends StatefulWidget {
   final String appBarTitle;
-  final Transact transact;
+  final TransBill transact;
 
   TransactUpdate(this.transact, this.appBarTitle);
 
@@ -33,16 +36,15 @@ class _TransactUpdateState extends State<TransactUpdate> {
   var _currentItemSelected = '';
 
   String appBarTitle;
-  Transact _transact = Transact();
+  TransBill _transBill = TransBill();
+  Transact _updateData = Transact();
   DatabaseHelper _dbHelper;
   final _formKey = GlobalKey<FormState>();
-  final _ctrlBillID= TextEditingController();
-  final _ctrlDueDate = TextEditingController();
-  final _ctrlDueAmount = TextEditingController();
+  final _ctrlPayNote= TextEditingController();
+  final _ctrlPayImage = TextEditingController();
   final _ctrlPayAmount = TextEditingController();
-  final _ctrlPayDate = TextEditingController();
 
-  _TransactUpdateState(this._transact, this.appBarTitle);
+  _TransactUpdateState(this._transBill, this.appBarTitle);
 
   @override
   void initState() {
@@ -51,12 +53,11 @@ class _TransactUpdateState extends State<TransactUpdate> {
     setState(() {
       _dbHelper = DatabaseHelper.instance;
 
-      if (this._transact != null){
-        _ctrlBillID.text = _transact.billID.toString();
-        _ctrlDueDate.text = _transact.dueDate;
-        _ctrlDueAmount.text = _transact.dueAmount.toString();
-        _ctrlPayAmount.text = _transact.payAmount.toString();
-        _ctrlPayDate.text = _transact.payDate;
+      if (this._transBill != null){
+        _ctrlPayAmount.text = _transBill.dueAmount.toString();
+        _ctrlPayNote.text = _transBill.billName.toString();
+        _ctrlPayImage.text = _transBill.billID.toString();
+
 
       }
     });
@@ -83,10 +84,28 @@ class _TransactUpdateState extends State<TransactUpdate> {
           ),
         ),
       ),
+      drawer: NavDrawer(),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+        child: ListView(
+
           children: <Widget>[
+            Container(
+              child:
+              Column(
+                children: <Widget>[
+                  Text("tID : ${_transBill.tID.toString()}"),
+                  Text("Bill ID : ${_transBill.billID.toString()}"),
+                  Text("Due Amount : ${_transBill.dueAmount.toString()}"),
+                  Text("Due Date : ${_transBill.dueDate}"),
+                  Text("Pay Amount : ${_transBill.payAmount.toString()}"),
+                  Text("Pay Date  :${_transBill.payDate}"),
+                  Text("Status  :${_transBill.status}"),
+                  Text("Name : ${_transBill.billName}"),
+                  Text("Cat : ${_transBill.billCat}"),
+                ],
+              ),
+
+            ),
             _form(),
           ],
         ),
@@ -103,37 +122,32 @@ class _TransactUpdateState extends State<TransactUpdate> {
       key: _formKey,
       child: Column(
         children: <Widget>[
-          TextFormField(
-            controller: _ctrlBillID,
-            decoration: InputDecoration(labelText: "Full Name"),
-            onSaved: (val) => setState(() => _transact.billID = int.parse(val)),
-            validator: (val) =>
-            (val.length == 0 ? 'This field is required' : null),
-          ),
 
-          TextFormField(
-            controller: _ctrlDueDate,
-            decoration: InputDecoration(labelText: "Full Name"),
-            onSaved: (val) => setState(() => _transact.dueDate),
-            validator: (val) =>
-            (val.length == 0 ? 'This field is required' : null),
-          ),
-
-
-          TextFormField(
-            controller: _ctrlDueAmount,
-            decoration: InputDecoration(labelText: "Periodic"),
-            onSaved: (val) => setState(() => _transact.dueAmount = double.parse(val)),
-            validator: (val) => (val.length < 2
-                ? 'At least 2 characters required'
-                : null),
-          ),
 
           TextFormField(
             controller: _ctrlPayAmount,
-            decoration: InputDecoration(labelText: "Transact Icon"),
-            onSaved: (val) => setState(() => _transact.payAmount = double.parse(val)),
+            decoration: InputDecoration(labelText: "Pay Amount"),
+            onSaved: (val) => setState(() => _updateData.payAmount = double.parse(val)),
+            validator: (val) =>
+            (val.length == 0 ? 'This field is required' : null),
           ),
+
+          TextFormField(
+            controller: _ctrlPayNote,
+            decoration: InputDecoration(labelText: "Payment Note"),
+            onSaved: (val) => setState(() => _updateData.payNote),
+            validator: (val) =>
+            (val.length == 0 ? 'This field is required' : null),
+          ),
+
+          TextFormField(
+            controller: _ctrlPayImage,
+            decoration: InputDecoration(labelText: "Payment Image"),
+            onSaved: (val) => setState(() => _updateData.payImage),
+            validator: (val) =>
+            (val.length == 0 ? 'This field is required' : null),
+          ),
+
 
           Container(
             margin: EdgeInsets.all(10.0),
@@ -144,35 +158,60 @@ class _TransactUpdateState extends State<TransactUpdate> {
               textColor: Colors.white,
             ),
           ),
-          Container(
-            margin: EdgeInsets.all(10.0),
-            child: RaisedButton(
-              onPressed: () {
-                Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => TransactList(title: "Add Category")));
-              },
-              child: Text("Add Category"),
-              color: darkBlueColor,
-              textColor: Colors.white,
-            ),
-          ),
+
         ],
       ),
     ),
   );
 
   _onSubmit() async {
-    debugPrint('OnSubmit Func is called');
+
+    debugPrint('Update Transaction is called');
+    setState(() {
+      _updateData.tID = _transBill.tID;
+      _updateData.billID = _transBill.billID;
+      _updateData.dueDate = _transBill.dueDate;
+      _updateData.dueAmount = _transBill.dueAmount;
+      _updateData.payDate = DateTime.now().toString();
+      _updateData.status = "Paid";
+    });
+
 
     var form = _formKey.currentState;
     if (form.validate()) {
+/*
+      _updateData.billID = _transBill.billID;
+      _updateData.dueDate = _transBill.dueDate;
+      _updateData.dueAmount = _transBill.dueAmount;
+      _updateData.payDate = "Now";//DateTime.now().toString();
+      _updateData.status = "Paid";
+*/
+
+      debugPrint("This is just before insert");
+      debugPrint("_transbil  tID :  ${_transBill.tID.toString()}}");
+      debugPrint("_transbil bill ID :  ${_transBill.billID.toString()}}");
+      debugPrint("");
+
+      debugPrint("_updateData tID :  ${_updateData.tID.toString()}}");
+      debugPrint("_updateData bill ID :  ${_updateData.billID.toString()}}");
+      debugPrint("_updateData due amount :  ${_updateData.dueAmount.toString()}}");
+      debugPrint("_updateData due date :  ${_updateData.dueDate.toString()}}");
+      debugPrint("_updateData pay amount :  ${_updateData.payAmount.toString()}}");
+      debugPrint("_updateData pay date :  ${_updateData.payDate.toString()}}");
+      debugPrint("_updateData status:  ${_updateData.status.toString()}}");
+      debugPrint("_updateData Note:  ${_updateData.payNote.toString()}}");
+      debugPrint("_updateData Image:  ${_updateData.payImage.toString()}}");
+
+
       form.save();
-      if (_transact.tID == null)
-        await _dbHelper.insertTransact(_transact);
+      if (_transBill.tID == null)
+        await _dbHelper.insertTransact(_updateData);
       else
-        await _dbHelper.updateTransact(_transact);
-//      _resetForm();
+        await _dbHelper.updateTransact(_updateData);
+
+
       Navigator.of(this.context).push(
-        MaterialPageRoute(builder: (context) => TransactList(title: "Transact List")),
+        MaterialPageRoute(builder: (context) => TransList(title: "Transact List")),
       );
     }
   }

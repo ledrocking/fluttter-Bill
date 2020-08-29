@@ -1,5 +1,6 @@
 
 
+import 'package:bill_reminder/bill/NavDrawer.dart';
 import 'package:flutter/material.dart';
 import 'category_class.dart';
 import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_form.dart';
@@ -48,6 +49,7 @@ class _MyCategoryListState extends State<MyCategoryList> {
           ),
         ),
       ),
+      drawer: NavDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

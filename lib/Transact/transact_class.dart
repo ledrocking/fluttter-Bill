@@ -29,8 +29,6 @@ class Transact {
   String payNote;
   String payImage;
   String status;
-  String billName;
-  String billCat;
 
   Transact.fromMap(Map<String, dynamic> map) {
     tID = map[colTID];
@@ -42,9 +40,6 @@ class Transact {
     payNote = map[colPayNote];
     payImage = map[colPayImage];
     status = map[colStatus];
-    billName = map[Bill.colName];
-    billCat = map[Bill.colCat];
-
   }
 
   Map<String, dynamic> toMap() {

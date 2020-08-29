@@ -7,6 +7,7 @@ import 'package:bill_reminder/bill/bill_data_class.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 
+import 'NavDrawer.dart';
 import 'bill_list.dart';
 
 
@@ -87,6 +88,7 @@ class _EditFormState extends State<EditForm> {
           ),
         ),
       ),
+      drawer: NavDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -270,7 +272,7 @@ class _EditFormState extends State<EditForm> {
         _date = picked;
       });
 //    String formattedDate = DateFormat('dd-MMM-yyy – kk:mm').format(_date);
-      formattedDate = DateFormat('dd-MMM-yyy').format(_date);
+      formattedDate = DateFormat('yyy-MM-dd').format(_date);
       debugPrint("$formattedDate");
       _ctrlStartDate.text = formattedDate;
       return formattedDate;

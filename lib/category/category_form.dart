@@ -1,3 +1,4 @@
+import 'package:bill_reminder/bill/NavDrawer.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'category_class.dart';
@@ -47,6 +48,7 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
           ),
         ),
       ),
+      drawer: NavDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,

@@ -16,6 +16,8 @@ import 'package:path/path.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
 
+import 'NavDrawer.dart';
+
 const darkBlueColor = Color(0xff486579);
 
 class MyForm extends StatefulWidget {
@@ -89,6 +91,7 @@ class _MyFormState extends State<MyForm> {
           ),
         ),
       ),
+      drawer: NavDrawer(),
       body: Container(
         child: ListView(
 //          mainAxisAlignment: MainAxisAlignment.start,
@@ -304,18 +307,7 @@ class _MyFormState extends State<MyForm> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Container(
-                margin: EdgeInsets.all(10.0),
-                child: RaisedButton(
-                  onPressed: () {
-                    Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => BillList(title: "Home")));
-                  },
 
-                  child: Text("Cancel"),
-                  color: darkBlueColor,
-                  textColor: Colors.white,
-                ),
-              ),
               Container(
                 margin: EdgeInsets.all(10.0),
                 child: RaisedButton(
@@ -370,7 +362,8 @@ class _MyFormState extends State<MyForm> {
         _date = picked;
       });
 //    String formattedDate = DateFormat('dd-MMM-yyy – kk:mm').format(_date);
-      formattedDate = DateFormat('dd-MMM-yyy').format(_date);
+//      formattedDate = _date.toString();
+      formattedDate = DateFormat('yyy-MM-dd').format(_date);
       debugPrint("$formattedDate");
 
       if (source == 1) {
