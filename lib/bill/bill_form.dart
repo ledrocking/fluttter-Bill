@@ -125,19 +125,24 @@ class _MyFormState extends State<MyForm> {
         //OK       await _dbHelper.insertBill2(_bill); // Insert data into Bill Table
 
         //Insert data into Transact Table
-/*        var _start = DateTime.parse(_bill.startDate);
+        var _start = DateTime.parse(_bill.startDate);
         var _end = DateTime.parse(_bill.endDate);
+        var _periodic = "Monthly";
+        int _number = 1;
 
-        while (_start <= _end) {
+        do {
+          _transact.billID = insertedID;
+          _transact.dueDate = _start.toString();
+          _transact.dueAmount = _bill.amount;
+          _transact.status = "Unpaid";
+          await _dbHelper.insertTransact(_transact);
+          debugPrint("insert no $_number for date $_start");
+          _number++;
+          _start = new DateTime(_start.year, _start.month + 1, _start.day);
 
-        } */
+        } while (_start.isBefore(_end));
 
-        _transact.billID = insertedID;
-        _transact.dueDate = _bill.startDate;
-        _transact.dueAmount = _bill.amount;
-        _transact.status = "Unpaid";
-        await _dbHelper.insertTransact(_transact);
-        debugPrint("Data is inserted into Transact Table");
+
 
       }
 

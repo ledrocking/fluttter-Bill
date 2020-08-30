@@ -283,7 +283,9 @@ class DatabaseHelper {
         FROM ${Transact.tblTransact} 
         INNER JOIN ${Bill.tblBill}
         ON ${Bill.colId} = ${Transact.colBillID} 
-        WHERE $_myDue BETWEEN  DATE('$_date','start of month','+0 month','-0 day') AND DATE('$_date','start of month','+1 month','-0 day')
+        WHERE $_myDue BETWEEN  DATE('$_date','start of month','+0 month','-0 day') 
+        AND DATE('$_date','start of month','+1 month','-0 day')
+        ORDER BY ${Transact.colStatus} DESc, ${Transact.colDueDate} ASC
         '''
     );
 
