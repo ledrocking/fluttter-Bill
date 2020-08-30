@@ -23,15 +23,20 @@ class TransList extends StatefulWidget {
 class _TransListState extends State<TransList> {
 
   List<TransBill> _transacts = [];
+  String _date = DateTime.now().toString();
+  DateTime _myDate;
 
-/*  @override
+  String _period = DateTime.now().toString();
+  String _periodName = DateFormat('MMMM yyy').format(DateTime.parse(DateTime.now().toString()));
+
+
+  @override
   void initState() {
     super.initState();
+    _myDate = DateTime.now();
     setState(() {
-      _dbHelper = DatabaseHelper.instance;
     });
-    _getTransList();
-  }*/
+  }
 
 
   @override
@@ -61,12 +66,29 @@ class _TransListState extends State<TransList> {
               fontWeight: FontWeight.bold,
               fontSize: 16.0,
             ),),
-            Text("${DateFormat('MMMM yyy').format(DateTime.parse(DateTime.now().toString()))}",
-                    style: TextStyle(
-                    color: darkBlueColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20.0,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+
+                IconButton(
+                  icon: Icon(Icons.arrow_back_ios),
+                  onPressed: () => changePeriod(-1),
+                  color: Colors.redAccent,
                 ),
+                Text("$_periodName",
+                        style: TextStyle(
+                        color: darkBlueColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                    ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.arrow_forward_ios),
+                  onPressed: () => changePeriod(1),
+                  color: Colors.redAccent,
+                ),
+
+              ],
             ),
 
             SizedBox(height: 30,),
@@ -74,7 +96,7 @@ class _TransListState extends State<TransList> {
 
             Expanded(
               child: FutureBuilder<List<TransBill>>(
-                  future: DatabaseHelper.instance.fetchJoin(),
+                  future: DatabaseHelper.instance.fetchJoin2(_myDate.toString()),
                 builder: (context, AsyncSnapshot<List<TransBill>> snapshot) {
                     if (snapshot.connectionState == ConnectionState.done &&
                         snapshot.hasData == null) {
@@ -118,7 +140,7 @@ class _TransListState extends State<TransList> {
                                 ),
 
                                 trailing: IconButton(
-                                    icon: Icon(Icons.delete_sweep, color: Colors.redAccent),
+                                    icon: Icon(Icons.delete_sweep, color: Colors.redAccent,),
 
                                 ),
 
@@ -153,4 +175,22 @@ class _TransListState extends State<TransList> {
 
 
   DatabaseHelper _dbHelper;
+
+  changePeriod(int source) {
+    int _source = source;
+    debugPrint("Next Period is clicked");
+    debugPrint("Ori _myDate before is : $_myDate");
+    setState(() {
+      if (_source == 1) {
+      _myDate = new DateTime(_myDate.year, _myDate.month + 1, _myDate.day);
+      }
+      else {
+        _myDate = new DateTime(_myDate.year, _myDate.month - 1, _myDate.day);
+      }
+      _periodName = DateFormat('MMMM yyy').format(DateTime.parse(_myDate.toString()));
+    });
+    debugPrint("Now _myDate is : $_myDate");
+  }
 }
+
+

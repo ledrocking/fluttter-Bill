@@ -212,13 +212,25 @@ class DatabaseHelper {
 //ok               AND ${DateTime.parse(Transact.colDueDate)} < ${DateTime.now()}
   //         > ${DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()))}
   //        WHERE  "2020-08-01" < DateTime.parse(DateTime.now().toString())
+  //OK              WHERE ${Transact.colDueDate} < "$_date"
+  //ok         WHERE $_myDue BETWEEN  "2020-07-01" AND "$_date"
+  //OK         WHERE $_myDue BETWEEN  "2020-07-01" AND "2020-12-01"
+  // OK         WHERE $_myDue BETWEEN  "2020-07-01" AND DATE('$_date','start of month','+1 month','-1 day')
 
 // SELECT JOIN TABLE TRANSACT & BILL
   Future<List<TransBill>> fetchJoin() async {
     Database db = await database;
-    String _date = '2020-10-29';
- //   String _date = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
+ //   String _date = '2020-10-29';
+    String _date = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
+    String _date1 = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
+    String _date2 = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
+    String _myDue = Transact.colDueDate;
+//    String _myDue = DateFormat('yyyy-MM-dd').format(DateTime.parse(Transact.colDueDate));
+//    String _myDue2 = DateFormat('yyy-MM-dd').format(DateTime.parse(_myDue));
 
+ /*   String _date = DateFormat('yyyy-MM').format(DateTime.parse(DateTime.now().toString()));
+    String _myDue = DateFormat('yyyy-MM').format(DateTime.parse(Transact.colDueDate.toString()));
+*/
     List<Map> transBills  = await db.rawQuery(
         '''
         SELECT ${TransBill.colTID}, ${TransBill.colBillID}, ${Transact.colDueDate}, ${Transact.colDueAmount},
@@ -227,7 +239,7 @@ class DatabaseHelper {
         FROM ${Transact.tblTransact} 
         INNER JOIN ${Bill.tblBill}
         ON ${Bill.colId} = ${Transact.colBillID} 
-        WHERE ${Transact.colDueDate} < "$_date"
+        WHERE $_myDue BETWEEN  DATE('$_date','start of month','+0 month','-1 day') AND DATE('$_date','start of month','+1 month','-0 day')
         '''
     );
 
@@ -239,9 +251,48 @@ class DatabaseHelper {
     }
 
     debugPrint("var _date : $_date");
+
     debugPrint("Original Now     : ${DateTime.now()}");
+
     debugPrint("Not formatted : ${(myList[1].dueDate)}");
+    debugPrint("Month Format : ${DateFormat('yyyy-MM').format(DateTime.parse(DateTime.now().toString()))}");
+    debugPrint("Month Format : ${DateFormat('MM-yyyy').format(DateTime.parse(DateTime.now().toString()))}");
 
     return myList;
     }
+
+
+
+  // SELECT JOIN TABLE TRANSACT & BILL
+  Future<List<TransBill>> fetchJoin2(period) async {
+    String _period = period;
+    String myPeriod = DateTime.now().toString();
+
+
+    Database db = await database;
+    String _date = DateFormat('yyyy-MM-dd').format(DateTime.parse(_period));
+    String _date1 = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
+    String _date2 = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
+    String _myDue = Transact.colDueDate;
+
+    List<Map> transBills  = await db.rawQuery(
+        '''
+        SELECT ${TransBill.colTID}, ${TransBill.colBillID}, ${Transact.colDueDate}, ${Transact.colDueAmount},
+        ${Transact.colPayDate}, ${Transact.colPayAmount}, ${Transact.colPayNote},
+        ${Transact.colPayImage}, ${Transact.colStatus}, ${Bill.colName},  ${Bill.colCat}
+        FROM ${Transact.tblTransact} 
+        INNER JOIN ${Bill.tblBill}
+        ON ${Bill.colId} = ${Transact.colBillID} 
+        WHERE $_myDue BETWEEN  DATE('$_date','start of month','+0 month','-0 day') AND DATE('$_date','start of month','+1 month','-0 day')
+        '''
+    );
+
+    List<TransBill> myList = transBills.length == 0
+        ? [] : transBills.map((x) => TransBill.fromMap(x)).toList();
+
+    if (myList ==null){
+      debugPrint("No Data from join");
+    }
+    return myList;
+  }
 }

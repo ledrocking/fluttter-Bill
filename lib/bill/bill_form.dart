@@ -125,6 +125,13 @@ class _MyFormState extends State<MyForm> {
         //OK       await _dbHelper.insertBill2(_bill); // Insert data into Bill Table
 
         //Insert data into Transact Table
+/*        var _start = DateTime.parse(_bill.startDate);
+        var _end = DateTime.parse(_bill.endDate);
+
+        while (_start <= _end) {
+
+        } */
+
         _transact.billID = insertedID;
         _transact.dueDate = _bill.startDate;
         _transact.dueAmount = _bill.amount;
