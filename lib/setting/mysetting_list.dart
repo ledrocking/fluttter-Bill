@@ -3,25 +3,25 @@
 import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/component/NavDrawer.dart';
 import 'package:bill_reminder/component/my_header.dart';
 import 'package:flutter/material.dart';
-import 'category_class.dart';
+import 'mysetting_class.dart';
 import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/bill/bill_form.dart';
-import 'category_form.dart';
+import 'mysetting_form.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 
 const darkBlueColor = Color(0xff486579);
 
-class MyCategoryList extends StatefulWidget {
-  MyCategoryList({Key key, this.title}) : super(key: key);
+class MySettingList extends StatefulWidget {
+  MySettingList({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyCategoryListState createState() => _MyCategoryListState();
+  _MySettingListState createState() => _MySettingListState();
 }
 
-class _MyCategoryListState extends State<MyCategoryList> {
-  MyCategory _myCategory = MyCategory();
-  List<MyCategory> _myCategories = [];
+class _MySettingListState extends State<MySettingList> {
+  MySetting _mySetting = MySetting();
+  List<MySetting> _mySettings = [];
   DatabaseHelper _databaseHelper;
   List<String> myCatList = [];
 
@@ -30,23 +30,23 @@ class _MyCategoryListState extends State<MyCategoryList> {
     super.initState();
     setState(() {
       _databaseHelper = DatabaseHelper.instance;
-      _refreshMyCategoryList();
+      _refreshMySettingList();
     });
 
   }
 
   @override
   Widget build(BuildContext context) {
-    return MyHeader(myTitle: "Category List", myContent: _list(),);
+    return MyHeader(myTitle: "Setting List", myContent: _list(),);
   }
 
-  _refreshMyCategoryList() async {
-    List<MyCategory> x = await _databaseHelper.fetchMyCategories();
+  _refreshMySettingList() async {
+    List<MySetting> x = await _databaseHelper.fetchMySettings();
     setState(() {
-      _myCategories = x;
-      _myCategories.forEach((element) {
-        debugPrint(element.name);
-        myCatList.add(element.name);
+      _mySettings = x;
+      _mySettings.forEach((element) {
+        debugPrint(element.password);
+        myCatList.add(element.password);
       });
       myCatList.forEach((element) {
         int i = 1;
@@ -71,7 +71,7 @@ class _MyCategoryListState extends State<MyCategoryList> {
                     leading: Icon(Icons.account_circle,
                         color: darkBlueColor, size: 40.0),
                     title: Text(
-                      _myCategories[index].name.toUpperCase(),
+                      _mySettings[index].password.toUpperCase(),
                       style: TextStyle(
                         color: darkBlueColor,
                         fontWeight: FontWeight.bold,
@@ -81,8 +81,8 @@ class _MyCategoryListState extends State<MyCategoryList> {
                     trailing: IconButton(
                         icon: Icon(Icons.delete_sweep, color: darkBlueColor),
                         onPressed: () async {
-                          await _databaseHelper.deleteMyCategory(_myCategories[index].id);
-                          _refreshMyCategoryList();
+                          await _databaseHelper.deleteMySetting(_mySettings[index].id);
+                          _refreshMySettingList();
                         }),
 
                   ),
@@ -92,11 +92,9 @@ class _MyCategoryListState extends State<MyCategoryList> {
                 ],
               );
             },
-            itemCount: _myCategories.length,
+            itemCount: _mySettings.length,
           ),
         ),
       );
-
-
 
 }

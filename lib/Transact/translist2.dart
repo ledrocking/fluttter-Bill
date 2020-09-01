@@ -13,16 +13,16 @@ import 'transact_class.dart';
 import 'package:path_provider/path_provider.dart';
 const darkBlueColor = Color(0xff486579);
 
-class TransList extends StatefulWidget {
-  TransList({Key key, this.title}) : super(key: key);
+class TransList2 extends StatefulWidget {
+  TransList2({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _TransListState createState() => _TransListState();
+  _TransList2State createState() => _TransList2State();
 }
 
-class _TransListState extends State<TransList> {
+class _TransList2State extends State<TransList2> {
 
   List<TransBill> _transacts = [];
   String _date = DateTime.now().toString();
@@ -187,7 +187,7 @@ class _TransListState extends State<TransList> {
 
                                       debugPrint('One transact is clicked');
                                       Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) => TransactUpdate(item, item.billName)
+                                        MaterialPageRoute(builder: (context) => TransactDetail(item, item.billName)
                                         ),
                                       );
                                     },
@@ -254,41 +254,19 @@ final formatCurrency = new NumberFormat.simpleCurrency();
 String currSymbol = "Rp.";
 
 detailInfo(TransBill item) {
-
-  int daysLeft = (DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays;
-  String daysLeftShow;
-  if (daysLeft > 1) {daysLeftShow = "${-daysLeft} days" ;}
-  if (daysLeft == 1) {daysLeftShow = "${-daysLeft} day" ;}
-  if (daysLeft == 0) {daysLeftShow = "$daysLeft day";}
-  if (daysLeft == -1) {daysLeftShow = "+${-daysLeft} day" ;}
-  if (daysLeft < -1) {daysLeftShow = "+${-daysLeft} days" ;}
-
-
-
-
   switch (item.status) {
     case "Paid":
       return
         Wrap(
           children: [
 
-            Text("Paid on ",
-          style: TextStyle(
-          fontFamily: 'Roboto',
-          color: Color(0xff1AC5A6),
-          fontWeight: FontWeight.bold,
-        )),
+            Text("Paid on "),
             Text(DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(item.payDate))),
             Text(",   "),
-            //           Text("\t "),
+ //           Text("\t "),
 
             Text("Amount paid "),
-            Text("${formatCurrency.format(item.payAmount)}",
-                style: TextStyle(
-                  color: Color(0xff1AC5A6),
-                  fontWeight: FontWeight.bold,
-                )
-            ),
+            Text("${formatCurrency.format(item.payAmount)}"),
           ],
         );
       break;
@@ -297,42 +275,29 @@ detailInfo(TransBill item) {
         Wrap(
           children: [
             Text("Due : ${DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(item.dueDate))},  "),
-  //          Text("(${(DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays} "
-
-            Text("($daysLeftShow)",
-                style: TextStyle(
-                fontFamily: 'Roboto',
-                color: getColor(daysLeft),
-                fontWeight: FontWeight.bold,
-//                fontSize: 20.0,
-                ),
-              ),
+            Text("(${(DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays} "
+                "days) "),
             Text("Amount "),
             Text(r"$"),
-            Text(" ${oCcy.format(item.dueAmount)}",
-                style: TextStyle(
-                  fontFamily: 'Roboto',
-                  fontWeight: FontWeight.bold,
-                )),
+            Text(" ${oCcy.format(item.dueAmount)}"),
           ],
         );
 
-  }
+    }
 
 }
 
 getIcon(context, String status, TransBill item, String billName) {
 
-  int daysLeft = (DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays;
   switch (status) {
     case "Paid":
       return Icon(Icons.check_circle,
-        color: Color(0xff1AC5A6));
+      color: Colors.teal,);
       break;
     case "Partial":
       return IconButton(
           icon: Icon(Icons.invert_colors),
-          color: getColor(daysLeft),
+          color: Colors.deepOrange,
           onPressed: () {
             Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => TransactUpdate(item, billName)));
@@ -343,24 +308,13 @@ getIcon(context, String status, TransBill item, String billName) {
     default:
       return IconButton(
           icon: Icon(Icons.update),
-          color: getColor(daysLeft),
+          color: Colors.deepOrange,
           onPressed: () {
-            Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => TransactUpdate(item, billName)));
+              Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => TransactUpdate(item, billName)));
           }
       );
   }
 }
-
-Color getColor (int daysLeft) {
-  int _daysLeft = daysLeft;
-  if  (daysLeft > 0) {
-    return Colors.lightBlue;
-    }
-  else return Colors.deepOrange;
-}
-
-
-
 
 

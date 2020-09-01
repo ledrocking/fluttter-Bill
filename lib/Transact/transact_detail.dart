@@ -1,6 +1,7 @@
 import 'package:bill_reminder/Transact/transact_class.dart';
 import 'package:bill_reminder/Transact/transbill_class.dart';
-import 'package:bill_reminder/bill/NavDrawer.dart';
+import 'package:bill_reminder/component/my_header.dart';
+import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/component/NavDrawer.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'transact_update.dart';
@@ -40,33 +41,8 @@ class _TransactDetailState extends State<TransactDetail> {
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors
-            .lightBlue, // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Center(
-          child: Text(
-            widget.appBarTitle,
-            style: TextStyle(color: darkBlueColor),
-          ),
-        ),
-      ),
-      drawer: NavDrawer(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            _form(),
-          ],
-        ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    return MyHeader(myTitle: "Transaction Detail", myContent: _form(),);
   }
-
-
 
   _form() => Container(
         color: Colors.white,

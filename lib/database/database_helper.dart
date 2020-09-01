@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:bill_reminder/Transact/transbill_class.dart';
+import 'package:bill_reminder/setting/mysetting_class.dart';
 
 class DatabaseHelper {
   static const _databaseName = 'BillDatabase.db';
@@ -71,6 +72,17 @@ class DatabaseHelper {
         ${Transact.colPayNote} TEXT,
         ${Transact.colPayImage} TEXT,
         ${Transact.colStatus} TEXT
+      )
+      '''
+    );
+
+    //Create Table Setting
+    await db.execute('''
+      CREATE TABLE ${MySetting.tblSetting}(
+      ${MySetting.colId} INTEGER PRIMARY KEY AUTOINCREMENT,
+      ${MySetting.colPassword} TEXT,
+      ${MySetting.colSymbol} TEXT
+      ${MySetting.colFormat} TEXT
       )
       '''
     );
@@ -173,6 +185,38 @@ class DatabaseHelper {
   }
 
   //--------------------------------------------------------------------------
+  //CRUD MySetting TABLE
+  //mySetting - insert
+  Future<int> insertMySetting(MySetting mySetting) async {
+    Database db = await database;
+    return await db.insert(MySetting.tblSetting, mySetting.toMap());
+  }
+
+  //mySetting - update
+  Future<int> updateMySetting(MySetting mySetting) async {
+    Database db = await database;
+    return await db.update(MySetting.tblSetting, mySetting.toMap(),
+        where: '${MySetting.colId}=?', whereArgs: [mySetting.id]);
+  }
+
+  //mySetting - delete
+  Future<int> deleteMySetting(int id) async {
+    Database db = await database;
+    return await db.delete(MySetting.tblSetting,
+        where: '${MySetting.colId}=?', whereArgs: [id]);
+  }
+
+  //mySetting - retrieve all
+  Future<List<MySetting>> fetchMySettings() async {
+    Database db = await database;
+    List<Map> mySettings = await db.query(MySetting.tblSetting);
+    return mySettings.length == 0
+        ? []
+        : mySettings.map((x) => MySetting.fromMap(x)).toList();
+  }
+
+
+  //--------------------------------------------------------------------------
   //CRUD Transact TABLE
   //transact - insert
   Future<int> insertTransact(Transact transact) async {
@@ -192,6 +236,13 @@ class DatabaseHelper {
     Database db = await database;
     return await db.delete(Transact.tblTransact,
         where: '${Transact.colTID}=?', whereArgs: [tID]);
+  }
+
+  //transact - delete all transaction for certain bill (when bill is deleted)
+  Future<int> deleteTransBill(int billID) async {
+    Database db = await database;
+    return await db.delete(Transact.tblTransact,
+        where: '${Transact.colBillID}=?', whereArgs: [billID]);
   }
 
   //transact - retrieve all

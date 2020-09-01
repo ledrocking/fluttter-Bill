@@ -1,5 +1,6 @@
 import 'package:bill_reminder/category/category_class.dart';
 import 'package:bill_reminder/category/category_list.dart';
+import 'package:bill_reminder/component/my_header.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
@@ -7,7 +8,7 @@ import 'package:bill_reminder/bill/bill_data_class.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
 
-import 'NavDrawer.dart';
+import '../component/NavDrawer.dart';
 import 'bill_list.dart';
 
 
@@ -66,162 +67,129 @@ class _EditFormState extends State<EditForm> {
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors
-            .lightBlue, // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Center(
-          child: Text(
-            widget.appBarTitle,
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-      drawer: NavDrawer(),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            _form(),
-          ],
-        ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    return MyHeader(myTitle: "Edit BIlls", myContent: _form(),);
   }
 
-
-
-  _form() => Container(
-    color: Colors.white,
-    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-    child: Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          TextFormField(
-            controller: _ctrlName,
-            decoration: InputDecoration(labelText: "Full Name"),
-            onSaved: (val) => setState(() => _bill.name = val),
-            validator: (val) =>
-            (val.length == 0 ? 'This field is required' : null),
-          ),
-
-          DropdownButtonFormField<String>(
-
-            decoration: InputDecoration(labelText: "Category"),
-            value: _currentItemSelected,
-            items: _myCats.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-
-            }).toList(),
-            onChanged: (String newValueSelected) {
-              // Your code to execute, when a menu item is selected from dropdown
-              setState(() {
-                this._currentItemSelected = newValueSelected;
-                _bill.cat = _currentItemSelected;
-              });
-            },
-            onSaved: (String newValueSelected) {
-              // Your code to execute, when a menu item is selected from dropdown
-              setState(() {
-                _bill.cat = _currentItemSelected;
-              });
-            },
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                flex: 7,
-                child: TextFormField(
-                  controller: _ctrlStartDate,
-                  decoration: InputDecoration(labelText: "Start Date"),
-                  onSaved: (val) => setState(() => _bill.startDate = val),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: IconButton(
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(this.context),
-                  color: darkBlueColor,
-                ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                flex: 7,
-                child: TextFormField(
-                  controller: _ctrlEndDate,
-                  decoration: InputDecoration(labelText: "End Date"),
-                  onSaved: (val) => setState(() => _bill.endDate = val),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: IconButton(
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(this.context),
-                  color: darkBlueColor,
-                ),
-              ),
-            ],
-          ),
-
-
-          TextFormField(
-            controller: _ctrlPeriodic,
-            decoration: InputDecoration(labelText: "Periodic"),
-            onSaved: (val) => setState(() => _bill.periodic = val),
-            validator: (val) => (val.length < 2
-                ? 'At least 2 characters required'
-                : null),
-          ),
-
-          TextFormField(
-            controller: _ctrlBillIcon,
-            decoration: InputDecoration(labelText: "Bill Icon"),
-            onSaved: (val) => setState(() => _bill.billIcon = val),
-          ),
-
-          Container(
-            margin: EdgeInsets.all(10.0),
-            child: RaisedButton(
-              onPressed: () => _onSubmit(),
-              child: Text("Submit"),
-              color: darkBlueColor,
-              textColor: Colors.white,
+  _form() => Expanded(
+    child: Container(
+      padding: EdgeInsets.symmetric(vertical: 30, horizontal: 30),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          children: <Widget>[
+            TextFormField(
+              controller: _ctrlName,
+              decoration: InputDecoration(labelText: "Full Name"),
+              onSaved: (val) => setState(() => _bill.name = val),
+              validator: (val) =>
+              (val.length == 0 ? 'This field is required' : null),
             ),
-          ),
-          Container(
-            margin: EdgeInsets.all(10.0),
-            child: RaisedButton(
-              onPressed: () {
-                Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
+
+            DropdownButtonFormField<String>(
+
+              decoration: InputDecoration(labelText: "Category"),
+              value: _currentItemSelected,
+              items: _myCats.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+
+              }).toList(),
+              onChanged: (String newValueSelected) {
+                // Your code to execute, when a menu item is selected from dropdown
+                setState(() {
+                  this._currentItemSelected = newValueSelected;
+                  _bill.cat = _currentItemSelected;
+                });
               },
-              child: Text("Add Category"),
-              color: darkBlueColor,
-              textColor: Colors.white,
+              onSaved: (String newValueSelected) {
+                // Your code to execute, when a menu item is selected from dropdown
+                setState(() {
+                  _bill.cat = _currentItemSelected;
+                });
+              },
             ),
-          ),
-        ],
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  flex: 7,
+                  child: TextFormField(
+                    controller: _ctrlStartDate,
+                    decoration: InputDecoration(labelText: "Start Date"),
+                    onSaved: (val) => setState(() => _bill.startDate = val),
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(this.context),
+                    color: darkBlueColor,
+                  ),
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  flex: 7,
+                  child: TextFormField(
+                    controller: _ctrlEndDate,
+                    decoration: InputDecoration(labelText: "End Date"),
+                    onSaved: (val) => setState(() => _bill.endDate = val),
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(this.context),
+                    color: darkBlueColor,
+                  ),
+                ),
+              ],
+            ),
+
+
+            TextFormField(
+              controller: _ctrlPeriodic,
+              decoration: InputDecoration(labelText: "Periodic"),
+              onSaved: (val) => setState(() => _bill.periodic = val),
+              validator: (val) => (val.length < 2
+                  ? 'At least 2 characters required'
+                  : null),
+            ),
+
+            TextFormField(
+              controller: _ctrlBillIcon,
+              decoration: InputDecoration(labelText: "Bill Icon"),
+              onSaved: (val) => setState(() => _bill.billIcon = val),
+            ),
+
+            SizedBox(height: 40,),
+            Container(
+              margin: EdgeInsets.all(10.0),
+              width: 200.0,
+              height: 50.0,
+              child: RaisedButton(
+                shape: StadiumBorder(),
+
+
+                onPressed: () => _onSubmit(),
+                child: Text("Save",
+                    style: TextStyle(fontSize: 20)),
+                color: Color(0xff1AC5A6),
+                textColor: Colors.white,
+              ),
+            ),
+
+          ],
+        ),
       ),
     ),
   );

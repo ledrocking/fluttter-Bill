@@ -1,5 +1,8 @@
 import 'dart:ffi';
 
+import 'package:bill_reminder/Transact/transList.dart';
+import 'package:bill_reminder/Transact/transbill_class.dart';
+import 'package:bill_reminder/component/my_header.dart';
 import 'package:flutter/material.dart';
 
 import 'package:bill_reminder/bill/bill_data_class.dart';
@@ -16,7 +19,7 @@ import 'package:path/path.dart';
 import 'dart:io';
 import 'package:intl/intl.dart';
 
-import 'NavDrawer.dart';
+import '../component/NavDrawer.dart';
 
 const darkBlueColor = Color(0xff486579);
 
@@ -78,30 +81,7 @@ class _MyFormState extends State<MyForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors
-            .lightBlue, // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Center(
-          child: Text(
-            widget.title,
-            style: TextStyle(color: darkBlueColor),
-          ),
-        ),
-      ),
-      drawer: NavDrawer(),
-      body: Container(
-        child: ListView(
-//          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            _form(),
-          ],
-        ),
-      ),
-      // This trailing comma makes auto-formatting nicer for build methods.
-    );
+    return MyHeader(myTitle: "New BIlls", myContent: _form(),);
   }
 
   _onSubmit() async {
@@ -159,181 +139,184 @@ class _MyFormState extends State<MyForm> {
   }
 
 
-
-  _form() => Container(
-    color: Colors.white,
-    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-    child: Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-          //TextFormField for Bill Name
-          TextFormField(
-            controller: _ctrlName,
-            decoration: InputDecoration(labelText: "Full Name"),
-            onSaved: (val) => setState(() => _bill.name = val),
-            validator: (val) =>
-            (val.length == 0 ? 'This field is required' : null),
-          ),
-
-          //TextFormField for Bill Category
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                flex: 7,
-                child: DropdownButtonFormField<String>(
-
-                  decoration: InputDecoration(labelText: "Category"),
-//            value: _currentItemSelected,
-                  items: _myCats.map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-
-                  }).toList(),
-                  onChanged: (String newValueSelected) {
-                    // Your code to execute, when a menu item is selected from dropdown
-                    setState(() {
-                      this._currentItemSelected = newValueSelected;
-                      _bill.cat = _currentItemSelected;
-                    });
-                  },
-                  onSaved: (String newValueSelected) {
-                    // Your code to execute, when a menu item is selected from dropdown
-                    setState(() {
-                      _bill.cat = _currentItemSelected;
-                    });
-                  },
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: IconButton(
-                  icon: Icon(Icons.add_box),
-                  tooltip: "Add new",
-                  onPressed: () {
-                    Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
-                  },
-                  color: darkBlueColor,
-                ),
-              ),
-            ],
-          ),
-
-          //TextFormField for Bill startDate
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                flex: 7,
-                child: TextFormField(
-                  controller: _ctrlStartDate,
-                  readOnly: true,
-                  decoration: InputDecoration(labelText: "Start Date"),
-                  onTap: () => _selectDate(this.context, 1),
-                  onSaved: (val) => setState(() => _bill.startDate = val),
-                ),
-              ),
-              Flexible(
-                flex: 1,
-                child: IconButton(
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(this.context, 1),
-                  color: darkBlueColor,
-                ),
-              ),
-            ],
-          ),
-
-          //TextFormField for Bill Amount
-          TextFormField(
-            controller: _ctrlAmount,
-            decoration: InputDecoration(labelText: "Amount"),
-            onSaved: (val) => setState(() => _bill.amount = double.parse(_ctrlAmount.text) as double),
-          ),
-
-
-          //TextFormField for Bill Periodic
-          Container(
-            child: DropdownButtonFormField<String>(
-
-              decoration: InputDecoration(labelText: "Periodic"),
-//            value: _currentPeriodicSelected,
-              items: _listPeriodic.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String newValueSelected) {
-                // Your code to execute, when a menu item is selected from dropdown
-                setState(() {
-                  this._currentPeriodicSelected = newValueSelected;
-                  _bill.periodic = _currentPeriodicSelected;
-                });
-              },
-              onSaved: (String newValueSelected) {
-                // Your code to execute, when a menu item is selected from dropdown
-                setState(() {
-                  _bill.periodic = _currentPeriodicSelected;
-                });
-              },
+  _form() => Expanded(
+    child: Container(
+//    color: Colors.white,
+      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          children: <Widget>[
+            //TextFormField for Bill Name
+            TextFormField(
+              controller: _ctrlName,
+              decoration: InputDecoration(labelText: "Bill Name"),
+              onSaved: (val) => setState(() => _bill.name = val),
+              validator: (val) =>
+              (val.length == 0 ? 'This field is required' : null),
             ),
-          ),
 
-          //TextFormField for Bill endDate
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Flexible(
-                flex: 7,
-                child: TextFormField(
-                  readOnly: true,
-                  controller: _ctrlEndDate,
-                  decoration: InputDecoration(labelText: "End Date", hintText: "Click icon on the right"),
-                  onTap: () => _selectDate(this.context, 2),
-                  onSaved: (val) => setState(() => _bill.endDate = val),
+            //TextFormField for Bill Category
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  flex: 7,
+                  child: DropdownButtonFormField<String>(
+
+                    decoration: InputDecoration(labelText: "Category",),
+//            value: _currentItemSelected,
+                    items: _myCats.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+
+                    }).toList(),
+                    onChanged: (String newValueSelected) {
+                      // Your code to execute, when a menu item is selected from dropdown
+                      setState(() {
+                        this._currentItemSelected = newValueSelected;
+                        _bill.cat = _currentItemSelected;
+                      });
+                    },
+                    onSaved: (String newValueSelected) {
+                      // Your code to execute, when a menu item is selected from dropdown
+                      setState(() {
+                        _bill.cat = _currentItemSelected;
+                      });
+                    },
+                  ),
                 ),
-              ),
-              Flexible(
-                flex: 1,
-                child: IconButton(
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(this.context, 2),
-                  color: darkBlueColor,
+                Flexible(
+                  flex: 1,
+                  child: IconButton(
+                    icon: Icon(Icons.add_box),
+                    tooltip: "Add new",
+                    onPressed: () {
+                      Navigator.of(this.context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
+                    },
+                    color: Color(0xffF15411),
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            ),
 
-          //TextFormField for Bill Icon
-          TextFormField(
-            controller: _ctrlBillIcon,
-            decoration: InputDecoration(labelText: "Bill Icon"),
-            onSaved: (val) => setState(() => _bill.billIcon = val),
-          ),
-
-          //Button for Submit & Cancel
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-
-              Container(
-                margin: EdgeInsets.all(10.0),
-                child: RaisedButton(
-                  onPressed: () => _onSubmit(),
-                  child: Text("Submit"),
-                  color: darkBlueColor,
-                  textColor: Colors.white,
+            //TextFormField for Bill startDate
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  flex: 7,
+                  child: TextFormField(
+                    controller: _ctrlStartDate,
+                    readOnly: true,
+                    decoration: InputDecoration(labelText: "(First) Due Date"),
+                    onTap: () => _selectDate(this.context, 1),
+                    onSaved: (val) => setState(() => _bill.startDate = val),
+                  ),
                 ),
+                Flexible(
+                  flex: 1,
+                  child: IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(this.context, 1),
+                    color: Color(0xffF15411),
+                  ),
+                ),
+              ],
+            ),
+
+            //TextFormField for Bill Amount
+            TextFormField(
+              controller: _ctrlAmount,
+              decoration: InputDecoration(labelText: "Default Amount"),
+              onSaved: (val) => setState(() => _bill.amount = double.parse(_ctrlAmount.text) as double),
+            ),
+
+
+            //TextFormField for Bill Periodic
+            Container(
+              child: DropdownButtonFormField<String>(
+
+                decoration: InputDecoration(labelText: "Repeat Periodic"),
+//            value: _currentPeriodicSelected,
+                items: _listPeriodic.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String newValueSelected) {
+                  // Your code to execute, when a menu item is selected from dropdown
+                  setState(() {
+                    this._currentPeriodicSelected = newValueSelected;
+                    _bill.periodic = _currentPeriodicSelected;
+                  });
+                },
+                onSaved: (String newValueSelected) {
+                  // Your code to execute, when a menu item is selected from dropdown
+                  setState(() {
+                    _bill.periodic = _currentPeriodicSelected;
+                  });
+                },
               ),
+            ),
 
-            ],
-          ),
+            //TextFormField for Bill endDate
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Flexible(
+                  flex: 7,
+                  child: TextFormField(
+                    readOnly: true,
+                    controller: _ctrlEndDate,
+                    decoration: InputDecoration(labelText: "Repeat Until", hintText: "Click icon on the right"),
+                    onTap: () => _selectDate(this.context, 2),
+                    onSaved: (val) => setState(() => _bill.endDate = val),
+                  ),
+                ),
+                Flexible(
+                  flex: 1,
+                  child: IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(this.context, 2),
+                    color: Color(0xffF15411),
+                  ),
+                ),
+              ],
+            ),
 
-        ],
+            //TextFormField for Bill Icon
+            Expanded(
+              child: TextFormField(
+                controller: _ctrlBillIcon,
+                decoration: InputDecoration(labelText: "Bill Icon"),
+                onSaved: (val) => setState(() => _bill.billIcon = val),
+              ),
+            ),
+
+            //Button for Submit & Cancel
+            SizedBox(height: 40,),
+            Container(
+              margin: EdgeInsets.all(10.0),
+              width: 200.0,
+              height: 50.0,
+              child: RaisedButton(
+                shape: StadiumBorder(),
+
+
+                onPressed: () => _onSubmit(),
+                child: Text("Save",
+                    style: TextStyle(fontSize: 20)),
+                color: Color(0xff1AC5A6),
+                textColor: Colors.white,
+              ),
+            ),
+
+          ],
+        ),
       ),
     ),
   );

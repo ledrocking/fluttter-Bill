@@ -1,9 +1,10 @@
 
 import 'package:bill_reminder/Transact/transList.dart';
 import 'package:bill_reminder/Transact/transbill_class.dart';
-import 'package:bill_reminder/bill/NavDrawer.dart';
+import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/component/NavDrawer.dart';
 import 'package:bill_reminder/category/category_class.dart';
 import 'package:bill_reminder/category/category_list.dart';
+import 'package:bill_reminder/component/my_header.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
@@ -65,103 +66,164 @@ class _TransactUpdateState extends State<TransactUpdate> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        backgroundColor: Colors
-            .lightBlue, // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Center(
-          child: Text(
-            widget.appBarTitle,
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
-      ),
-      drawer: NavDrawer(),
-      body: Center(
-        child: ListView(
+    return MyHeader(myTitle: "Update Payment", myContent: _form(),);
+  }
 
+
+  _form() => Column(
+    children: [
+      Container(
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        child:Column(
           children: <Widget>[
+            SizedBox(height: 30,),
+            Text(_transBill.billName,
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  color: Colors.deepOrange,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20.0,
+                )),
             Container(
-              child:
-              Column(
-                children: <Widget>[
-                  Text("tID : ${_transBill.tID.toString()}"),
-                  Text("Bill ID : ${_transBill.billID.toString()}"),
-                  Text("Due Amount : ${_transBill.dueAmount.toString()}"),
-                  Text("Due Date : ${_transBill.dueDate}"),
-                  Text("Pay Amount : ${_transBill.payAmount.toString()}"),
-                  Text("Pay Date  :${_transBill.payDate}"),
-                  Text("Status  :${_transBill.status}"),
-                  Text("Name : ${_transBill.billName}"),
-                  Text("Cat : ${_transBill.billCat}"),
+              margin: EdgeInsets.all(10.0),
+              decoration: BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                  border: Border.all(
+                  color: Color(0xff1AC5A6),
+                  width: 1.0,
+                ),
+              ),
+
+              child: Column(
+                children: [
+                  SizedBox(height: 20,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Due Amount :  ",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            color: Color(0xff1AC5A6),
+                            fontSize: 16.0,
+                          )),
+                      Text("${_transBill.dueAmount.toString()}",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                            fontSize: 16.0,
+                          )),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Due Date :  ",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            color: Color(0xff1AC5A6),
+                            fontSize: 16.0,
+                          )),
+                      Text("${DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(_transBill.dueDate))}",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                            fontSize: 16.0,
+                          )),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Status :  ",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            color: Color(0xff1AC5A6),
+                            fontSize: 16.0,
+                          )),
+                      Text("${_transBill.status}",
+                          style: TextStyle(
+                            fontFamily: 'Roboto',
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black54,
+                            fontSize: 16.0,
+                          )),
+                    ],
+                  ),
+                  SizedBox(height: 20,),
+
                 ],
               ),
 
             ),
-            _form(),
+
+            SizedBox(height: 10,),
+
+
+
           ],
         ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+
+      ),
+      Container(
+        color: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        child: Expanded(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget>[
+
+                TextFormField(
+                  controller: _ctrlPayAmount,
+                  decoration: InputDecoration(labelText: "Pay Amount"),
+                  onSaved: (val) => setState(() => _updateData.payAmount = double.parse(val)),
+                  validator: (val) =>
+                  (val.length == 0 ? 'This field is required' : null),
+                ),
+
+                TextFormField(
+                  controller: _ctrlPayNote,
+                  decoration: InputDecoration(labelText: "Payment Note"),
+                  onSaved: (val) => setState(() => _updateData.payNote),
+                  validator: (val) =>
+                  (val.length == 0 ? 'This field is required' : null),
+                ),
+
+                TextFormField(
+                  controller: _ctrlPayImage,
+                  decoration: InputDecoration(labelText: "Payment Image"),
+                  onSaved: (val) => setState(() => _updateData.payImage),
+                  validator: (val) =>
+                  (val.length == 0 ? 'This field is required' : null),
+                ),
 
 
-
-  _form() => Container(
-    color: Colors.white,
-    padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-    child: Form(
-      key: _formKey,
-      child: Column(
-        children: <Widget>[
-
-
-          TextFormField(
-            controller: _ctrlPayAmount,
-            decoration: InputDecoration(labelText: "Pay Amount"),
-            onSaved: (val) => setState(() => _updateData.payAmount = double.parse(val)),
-            validator: (val) =>
-            (val.length == 0 ? 'This field is required' : null),
-          ),
-
-          TextFormField(
-            controller: _ctrlPayNote,
-            decoration: InputDecoration(labelText: "Payment Note"),
-            onSaved: (val) => setState(() => _updateData.payNote),
-            validator: (val) =>
-            (val.length == 0 ? 'This field is required' : null),
-          ),
-
-          TextFormField(
-            controller: _ctrlPayImage,
-            decoration: InputDecoration(labelText: "Payment Image"),
-            onSaved: (val) => setState(() => _updateData.payImage),
-            validator: (val) =>
-            (val.length == 0 ? 'This field is required' : null),
-          ),
+                SizedBox(height: 30,),
+                Container(
+                  margin: EdgeInsets.all(10.0),
+                  width: 200.0,
+                  height: 50.0,
+                  child: RaisedButton(
+                    shape: StadiumBorder(),
 
 
-          Container(
-            margin: EdgeInsets.all(10.0),
-            child: RaisedButton(
-              onPressed: () => _onSubmit(),
-              child: Text("Submit"),
-              color: darkBlueColor,
-              textColor: Colors.white,
+                    onPressed: () => _onSubmit(),
+                    child: Text("Save",
+                        style: TextStyle(fontSize: 20)),
+                    color: Color(0xff1AC5A6),
+                    textColor: Colors.white,
+                  ),
+                ),
+
+              ],
             ),
           ),
-
-        ],
+        ),
       ),
-    ),
+    ],
   );
 
   _onSubmit() async {

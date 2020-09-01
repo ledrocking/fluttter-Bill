@@ -2,26 +2,26 @@ import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/component
 import 'package:bill_reminder/component/my_header.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'category_class.dart';
-import 'category_list.dart';
+import 'mysetting_class.dart';
+import 'mysetting_list.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 
 const darkBlueColor = Color(0xff486579);
 
-class MyCategoryForm extends StatefulWidget {
-  MyCategoryForm({Key key, this.title}) : super(key: key);
+class MySettingForm extends StatefulWidget {
+  MySettingForm({Key key, this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyCategoryFormState createState() => _MyCategoryFormState();
+  _MySettingFormState createState() => _MySettingFormState();
 }
 
-class _MyCategoryFormState extends State<MyCategoryForm> {
+class _MySettingFormState extends State<MySettingForm> {
   var _currentItemSelected = '';
 
-  MyCategory _myCategory = MyCategory();
-  List<MyCategory> _myCategories = [];
+  MySetting _mySetting = MySetting();
+  List<MySetting> _mySettings = [];
   DatabaseHelper _databaseHelper;
   final _formKey = GlobalKey<FormState>();
   final _ctrlName = TextEditingController();
@@ -36,7 +36,7 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
 
   @override
   Widget build(BuildContext context) {
-    return MyHeader(myTitle: "Add New Category", myContent: _form(),);
+    return MyHeader(myTitle: "Add New Setting", myContent: _form(),);
   }
 
   _form() => Expanded(
@@ -49,8 +49,8 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
               children: <Widget>[
                 TextFormField(
                   controller: _ctrlName,
-                  decoration: InputDecoration(labelText: "Category Name"),
-                  onSaved: (val) => setState(() => _myCategory.name = val),
+                  decoration: InputDecoration(labelText: "Setting Name"),
+                  onSaved: (val) => setState(() => _mySetting.password = val),
                   validator: (val) =>
                       (val.length == 0 ? 'This field is required' : null),
                 ),
@@ -77,20 +77,20 @@ class _MyCategoryFormState extends State<MyCategoryForm> {
     var form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      if (_myCategory.id == null)
-        await _databaseHelper.insertMyCategory(_myCategory);
+      if (_mySetting.id == null)
+        await _databaseHelper.insertMySetting(_mySetting);
       else
-        await _databaseHelper.updateMyCategory(_myCategory);
+        await _databaseHelper.updateMySetting(_mySetting);
 //      _resetForm();
       Navigator.of(this.context).push(
         MaterialPageRoute(
-            builder: (context) => MyCategoryList(title: "MyCategory List")),
+            builder: (context) => MySettingList(title: "MySetting List")),
       );
     }
   }
 
-  Future<List<MyCategory>>getList() async {
-    List<MyCategory> xCat = await _databaseHelper.fetchMyCategories();
+  Future<List<MySetting>>getList() async {
+    List<MySetting> xCat = await _databaseHelper.fetchMySettings();
     debugPrint('My Cat List is:  ${xCat.toString()}');
     return xCat;
   }
