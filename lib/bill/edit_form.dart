@@ -1,3 +1,4 @@
+import 'package:bill_reminder/Transact/transact_class.dart';
 import 'package:bill_reminder/category/category_class.dart';
 import 'package:bill_reminder/category/category_list.dart';
 import 'package:bill_reminder/component/my_header.dart';
@@ -32,8 +33,16 @@ class _EditFormState extends State<EditForm> {
   MyCategory _myCategory = MyCategory();
   List<MyCategory> _myCategories = [];
 
+  Transact _transact = Transact();
+
+  List<String> _listPeriodic = ["Monthly", "Biweekly", "Weekly", "No Repeat"];
   List<String> _myCats = [];
+
   var _currentItemSelected = '';
+  var _currentPeriodicSelected = '';
+
+
+  String oldEndDate = "";
 
   String appBarTitle;
   Bill _bill = Bill();
@@ -52,10 +61,15 @@ class _EditFormState extends State<EditForm> {
   void initState() {
     super.initState();
     _currentItemSelected = _bill.cat;
+
+
+
     setState(() {
       _dbHelper = DatabaseHelper.instance;
 
       _refreshMyCategoryList();
+      _currentPeriodicSelected = _bill.periodic;
+
       if (this._bill != null){
         _ctrlName.text = _bill.name;
         _ctrlCat.text = _bill.cat;
@@ -63,6 +77,7 @@ class _EditFormState extends State<EditForm> {
         _ctrlPeriodic.text = _bill.periodic;
         _ctrlEndDate.text = _bill.endDate;
         _ctrlBillIcon.text = _bill.billIcon;
+        oldEndDate = _bill.endDate;
 
       }
     });
@@ -119,7 +134,9 @@ class _EditFormState extends State<EditForm> {
                   flex: 7,
                   child: TextFormField(
                     controller: _ctrlStartDate,
-                    decoration: InputDecoration(labelText: "Start Date"),
+                    readOnly: true,
+                    decoration: InputDecoration(labelText: "(First) Due Date"),
+                    onTap: () => _selectDate(this.context, 1),
                     onSaved: (val) => setState(() => _bill.startDate = val),
                   ),
                 ),
@@ -127,20 +144,53 @@ class _EditFormState extends State<EditForm> {
                   flex: 1,
                   child: IconButton(
                     icon: Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(this.context),
-                    color: darkBlueColor,
+                    onPressed: () => _selectDate(this.context, 1),
+                    color: Color(0xffF15411),
                   ),
                 ),
               ],
             ),
+
+            //TextFormField for Bill Periodic
+            Container(
+              child: DropdownButtonFormField<String>(
+
+                decoration: InputDecoration(labelText: "Repeat Periodic"),
+                value: _currentPeriodicSelected,
+                items: _listPeriodic.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (String newValueSelected) {
+                  // Your code to execute, when a menu item is selected from dropdown
+                  setState(() {
+                    this._currentPeriodicSelected = newValueSelected;
+                    _bill.periodic = _currentPeriodicSelected;
+                  });
+                },
+                onSaved: (String newValueSelected) {
+                  // Your code to execute, when a menu item is selected from dropdown
+                  setState(() {
+                    _bill.periodic = _currentPeriodicSelected;
+                  });
+                },
+              ),
+            ),
+
+
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Flexible(
                   flex: 7,
                   child: TextFormField(
+                    readOnly: true,
                     controller: _ctrlEndDate,
-                    decoration: InputDecoration(labelText: "End Date"),
+                    decoration: InputDecoration(labelText: "Repeat Until", hintText: "Click icon on the right"),
+                    onTap: () => _selectDate(this.context, 2),
                     onSaved: (val) => setState(() => _bill.endDate = val),
                   ),
                 ),
@@ -148,22 +198,14 @@ class _EditFormState extends State<EditForm> {
                   flex: 1,
                   child: IconButton(
                     icon: Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(this.context),
-                    color: darkBlueColor,
+                    onPressed: () => _selectDate(this.context, 2),
+                    color: Color(0xffF15411),
                   ),
                 ),
               ],
             ),
 
 
-            TextFormField(
-              controller: _ctrlPeriodic,
-              decoration: InputDecoration(labelText: "Periodic"),
-              onSaved: (val) => setState(() => _bill.periodic = val),
-              validator: (val) => (val.length < 2
-                  ? 'At least 2 characters required'
-                  : null),
-            ),
 
             TextFormField(
               controller: _ctrlBillIcon,
@@ -180,7 +222,7 @@ class _EditFormState extends State<EditForm> {
                 shape: StadiumBorder(),
 
 
-                onPressed: () => _onSubmit(),
+                onPressed: () => _onSubmit(oldEndDate),
                 child: Text("Save",
                     style: TextStyle(fontSize: 20)),
                 color: Color(0xff1AC5A6),
@@ -194,16 +236,62 @@ class _EditFormState extends State<EditForm> {
     ),
   );
 
-  _onSubmit() async {
-    debugPrint('OnSubmit Func is called');
+  _onSubmit(oldEndDate) async {
+    String myOldEndDate = oldEndDate;
 
     var form = _formKey.currentState;
     if (form.validate()) {
       form.save();
-      if (_bill.id == null)
-        await _dbHelper.insertBill(_bill);
-      else
         await _dbHelper.updateBill(_bill);
+
+      debugPrint('Old End Date is $myOldEndDate');
+      debugPrint('New End Date is ${_ctrlEndDate.text}');
+
+      //if End Date is change
+      if (DateTime.parse(myOldEndDate).difference(DateTime.parse(_ctrlEndDate.text)).inDays >= 0) {
+        debugPrint('New Date is Earlier');
+        //New Date is earlier. Therefore delete transaction from new date to old date
+        // what start date/due date is also change? It safe to delete transaction from now onward, then create new one
+      }
+      else {
+        debugPrint('New Date is later');
+        //New Date is later. Therefore create transaction from old date to new date.
+        // what start date/due date is also change? It safe to delete transaction from now onward, then create new one
+      }
+
+
+      var _start = DateTime.parse(_bill.startDate);
+
+      var _endDelete = DateTime.parse(myOldEndDate);
+      _endDelete = new DateTime(_endDelete.year, _endDelete.month + 2, _endDelete.day + 1);
+
+      var _endInsert = DateTime.parse(_bill.endDate);
+      _endInsert = new DateTime(_endInsert.year, _endInsert.month, _endInsert.day + 1);
+
+      var _periodic = "Monthly";
+      int _number = 1;
+
+      // Data prep for delete and insert transaction
+      _transact.billID = _bill.id;
+      _transact.dueAmount = _bill.amount;
+      _transact.status = "Unpaid";
+
+      //Delete Transact data Table from now onward
+      await _dbHelper.deleteTransBillOnward(_bill.id, _endDelete.toString());
+
+      //Insert data into Transact Table from now to new en date
+      do {
+        _transact.dueDate = _start.toString();
+        await _dbHelper.insertTransact(_transact);
+        debugPrint("insert no $_number for date $_start");
+        _number++;
+        _start = new DateTime(_start.year, _start.month + 1, _start.day);
+
+      } while (_start.isBefore(_endInsert));
+
+
+
+
 //      _resetForm();
       Navigator.of(this.context).push(
         MaterialPageRoute(builder: (context) => BillList(title: "Bill List")),
@@ -228,7 +316,8 @@ class _EditFormState extends State<EditForm> {
   var formattedDate = "";
   var formattedTime = "";
 
-  Future<Null> _selectDate(BuildContext context) async {
+
+  Future<Null> _selectDate(BuildContext context, int source) async {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: _date,
@@ -236,30 +325,21 @@ class _EditFormState extends State<EditForm> {
         lastDate: new DateTime(2024));
     if (picked != null && picked != _date) {
       print('Date selected : ${_date.toString()}');
+      print('source : $source');
       setState(() {
         _date = picked;
       });
 //    String formattedDate = DateFormat('dd-MMM-yyy – kk:mm').format(_date);
+//      formattedDate = _date.toString();
       formattedDate = DateFormat('yyy-MM-dd').format(_date);
-      debugPrint("$formattedDate");
-      _ctrlStartDate.text = formattedDate;
-      return formattedDate;
-    }
-  }
 
-  Future<Null> _selectTime(BuildContext context) async {
-    final TimeOfDay picked = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay(hour: 10, minute: 00),
-    );
-    if (picked != null && picked != _time) {
-      print('Time selected : ${_time.toString()}');
-      setState(() {
-        _time = picked;
-      });
-      formattedTime = _time.format(context);
-      debugPrint("$formattedTime");
-      _ctrlStartDate.text = formattedDate + " " + formattedTime;
+      if (source == 1) {
+        _ctrlStartDate.text = formattedDate;
+      }
+      else {
+        _ctrlEndDate.text = formattedDate;
+      }
+//      return formattedDate.toString();
     }
   }
 
@@ -272,21 +352,22 @@ class _EditFormState extends State<EditForm> {
     });
     int i = 1;
     _myCategories.forEach((element) {
-      debugPrint(element.name);
       _myCatList.add('$i ' + element.name);
       _myCats.add(element.name);
       i++;
     });
-    debugPrint('This is from refresh myCats');
+
     int catNo = 1;
 
     _myCats.forEach((element) {
-      debugPrint('Cat No $catNo: $element');
+
       catNo++;
     });
-    debugPrint('This is from refresh myCatList');
+
     _myCatList.forEach((element) {
-      debugPrint('Cat is: $element');
     });
   }
+
+
+
 }

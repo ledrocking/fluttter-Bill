@@ -3,6 +3,7 @@ import 'package:bill_reminder/Transact/translist2.dart';
 import 'package:bill_reminder/category/category_form.dart';
 import 'package:bill_reminder/category/category_list.dart';
 import 'package:bill_reminder/setting/mysetting_list.dart';
+import 'package:bill_reminder/upload/image_picker.dart';
 import 'package:flutter/material.dart';
 
 import '../bill/bill_list.dart';
@@ -31,8 +32,6 @@ Widget menuList(context) {
         ),
 
         onTap: (){
-
-          debugPrint('Home Menu is clicked');
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => TransList(title: "TransList")));
         },
       ),
@@ -47,8 +46,6 @@ Widget menuList(context) {
         ),
 
         onTap: (){
-
-          debugPrint('Transaction Menu is clicked');
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => BillList(title: "TransList")));
         },
       ),
@@ -64,8 +61,6 @@ Widget menuList(context) {
         ),
 
         onTap: (){
-
-          debugPrint('Transaction Menu is clicked');
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => TransList2(title: "My Bills")));
         },
       ),
@@ -80,15 +75,13 @@ Widget menuList(context) {
         ),
 
         onTap: (){
-
-          debugPrint('Category Menu is Clicked');
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCategoryList(title: "Add Category")));
         },
       ),
       ListTile(
         leading: Icon(Icons.account_circle,
             color: darkBlueColor, size: 40.0),
-        title: Text("Add New Category",
+        title: Text("Image Picker",
           style: TextStyle(
             color: darkBlueColor,
             fontWeight: FontWeight.bold,
@@ -96,9 +89,7 @@ Widget menuList(context) {
         ),
 
         onTap: (){
-
-          debugPrint('Add New Category');
-          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCategoryForm(title: "Add Category")));
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => ImagePickerWidget()));
         },
       ),
       ListTile(
@@ -127,8 +118,6 @@ Widget menuList(context) {
         ),
 
         onTap: (){
-
-          debugPrint('Add New Category');
           Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCategoryForm(title: "Add Category")));
         },
       ),

@@ -57,7 +57,7 @@ class _MyFormState extends State<MyForm> {
 
 
 
-  List<String> _listPeriodic = ["Monthly", "BiWeekly", "Weekly", "No Repeat"];
+  List<String> _listPeriodic = ["Monthly", "Biweekly", "Weekly", "No Repeat"];
   List<String> _myCats = [];
   var _currentItemSelected = '';
   var _currentPeriodicSelected = '';
@@ -85,15 +85,10 @@ class _MyFormState extends State<MyForm> {
   }
 
   _onSubmit() async {
-    debugPrint('OnSubmit Func is called');
 
     //Insert data into  Table
     var form = _formKey.currentState;
     int insertedID;
-
-
-
-
 
     if (form.validate()) {
       form.save();
@@ -107,6 +102,8 @@ class _MyFormState extends State<MyForm> {
         //Insert data into Transact Table
         var _start = DateTime.parse(_bill.startDate);
         var _end = DateTime.parse(_bill.endDate);
+        _end = new DateTime(_end.year, _end.month, _end.day + 1);
+
         var _periodic = "Monthly";
         int _number = 1;
 
@@ -289,7 +286,7 @@ class _MyFormState extends State<MyForm> {
             ),
 
             //TextFormField for Bill Icon
-            Expanded(
+            Container(
               child: TextFormField(
                 controller: _ctrlBillIcon,
                 decoration: InputDecoration(labelText: "Bill Icon"),
@@ -359,7 +356,7 @@ class _MyFormState extends State<MyForm> {
 //    String formattedDate = DateFormat('dd-MMM-yyy – kk:mm').format(_date);
 //      formattedDate = _date.toString();
       formattedDate = DateFormat('yyy-MM-dd').format(_date);
-      debugPrint("$formattedDate");
+
 
       if (source == 1) {
         _ctrlStartDate.text = formattedDate;
@@ -380,21 +377,18 @@ class _MyFormState extends State<MyForm> {
     });
     int i = 1;
     _myCategories.forEach((element) {
-      debugPrint(element.name);
       _myCatList.add('$i ' + element.name);
       _myCats.add(element.name);
       i++;
     });
-    debugPrint('This is from refresh myCats');
+
     int catNo = 1;
 
     _myCats.forEach((element) {
-      debugPrint('Cat No $catNo: $element');
       catNo++;
     });
-    debugPrint('This is from refresh myCatList');
+
     _myCatList.forEach((element) {
-      debugPrint('Cat is: $element');
     });
   }
 }

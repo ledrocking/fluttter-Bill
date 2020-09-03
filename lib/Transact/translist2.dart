@@ -1,4 +1,7 @@
 
+
+import 'dart:ffi';
+
 import 'package:bill_reminder/Transact/transact_detail.dart';
 import 'package:bill_reminder/Transact/transact_update.dart';
 import 'package:bill_reminder/Transact/transbill_class.dart';
@@ -27,7 +30,7 @@ class _TransList2State extends State<TransList2> {
   List<TransBill> _transacts = [];
   String _date = DateTime.now().toString();
   DateTime _myDate;
-
+  double myDue = 0;
   String _period = DateTime.now().toString();
   String _periodName = DateFormat('MMMM yyy').format(DateTime.parse(DateTime.now().toString()));
 
@@ -42,6 +45,40 @@ class _TransList2State extends State<TransList2> {
     setState(() {
     });
   }
+
+  List<double> sumData = [];
+  Future getDataSum(List<TransBill> data) async {
+
+    dueTotal = 0;
+    paidTotal = 0;
+    totItem = 0;
+    paidItem = 0;
+
+    List<TransBill> _data = data;
+    _data.forEach((element) {
+      //Total Due Amount
+      dueTotal =  dueTotal + element.dueAmount;
+      totItem =  totItem + 1;
+
+      //Total Paid amount
+      if (element.payAmount!=null) {
+        paidTotal =  paidTotal + element.payAmount;
+        paidItem = paidItem + 1;
+      }
+    });
+
+    sumData.add(paidTotal);
+    sumData.add(dueTotal);
+
+    debugPrint("Total Item Number from getDataSum : $totItem");
+    debugPrint("Total Paid Item Number from getDataSum : $paidItem");
+    debugPrint("DueTotal from getDataSum $dueTotal");
+    debugPrint("PaidTotal from getDataSum $paidTotal");
+    debugPrint("Unpaid Total Amount from getDataSum ${(dueTotal - paidTotal)}");
+
+    return sumData;
+  }
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey =  GlobalKey<ScaffoldState>();
 
@@ -118,6 +155,11 @@ class _TransList2State extends State<TransList2> {
               ],
             ),
 
+
+
+
+
+
             SizedBox(height: 30,),
 
 
@@ -144,16 +186,45 @@ class _TransList2State extends State<TransList2> {
                       }
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.hasData == true) {
-                        return ListView.builder(
-                          itemCount : snapshot.data.length,
-                          itemBuilder: (context, index) {
-                            TransBill item = snapshot.data[index];
 
+                        getDataSum(snapshot.data);
+                        myDue = dueTotal;
+
+
+                        return ListView.builder(
+  //                        itemCount : snapshot.data.length,
+                          itemCount : snapshot.data == null ? 1 : snapshot.data.length + 1,
+                          itemBuilder: (context, index) {
+
+                            if (index == 0) {
+                              // return the header
+                              return new Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Text ("Total Paid"),
+                                      Text ("$paidTotal"),
+                                    ],
+                                  ),
+                                  Column(
+                                    children: [
+                                      Text ("Total Due"),
+                                      Text ("$myDue"),
+                                    ],
+                                  ),
+                                ],
+                              );
+                            }
+
+                            index = index - 1;
+                            var row = snapshot.data[index];
+
+                            TransBill item = row;
                             return Card(
                               margin: EdgeInsets.fromLTRB(10, 20, 10, 0),
                               child: Column(
                                 children: <Widget>[
-
 
                                   ListTile(
                                     leading: Icon(Icons.account_circle,
@@ -187,26 +258,32 @@ class _TransList2State extends State<TransList2> {
 
                                       debugPrint('One transact is clicked');
                                       Navigator.of(context).push(
-                                        MaterialPageRoute(builder: (context) => TransactDetail(item, item.billName)
+                                        MaterialPageRoute(builder: (context) => TransactUpdate(item, item.billName)
                                         ),
                                       );
                                     },
                                   ),
                                   Divider(
                                     height: 10.0,
-                                  )
-
+                                  ),
                                 ],
+
                               ),
+
+
                             );
+
                           },
                         );
 
                       }
                       else {return Align(child: CircularProgressIndicator());}
-                    }),
+                    }
+
+                    ),
               ),
             ),
+
           ],
 
 
@@ -236,12 +313,16 @@ class _TransList2State extends State<TransList2> {
     int _source = source;
     debugPrint("Next Period is clicked");
     debugPrint("Ori _myDate before is : $_myDate");
+ //   dueTotal = 0;
     setState(() {
       if (_source == 1) {
+
         _myDate = new DateTime(_myDate.year, _myDate.month + 1, _myDate.day);
+
       }
       else {
         _myDate = new DateTime(_myDate.year, _myDate.month - 1, _myDate.day);
+
       }
       _periodName = DateFormat('MMMM yyy').format(DateTime.parse(_myDate.toString()));
     });
@@ -249,24 +330,54 @@ class _TransList2State extends State<TransList2> {
   }
 }
 
+
+
+  double dueTotal = 0;
+  double paidTotal = 0;
+  int totItem = 0;
+  int paidItem = 0;
+
+
 final oCcy = new NumberFormat("#,##0.00", "en_US");
 final formatCurrency = new NumberFormat.simpleCurrency();
 String currSymbol = "Rp.";
 
 detailInfo(TransBill item) {
+
+  int daysLeft = (DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays;
+  String daysLeftShow;
+  if (daysLeft > 1) {daysLeftShow = "${-daysLeft} days" ;}
+  if (daysLeft == 1) {daysLeftShow = "${-daysLeft} day" ;}
+  if (daysLeft == 0) {daysLeftShow = "$daysLeft day";}
+  if (daysLeft == -1) {daysLeftShow = "+${-daysLeft} day" ;}
+  if (daysLeft < -1) {daysLeftShow = "+${-daysLeft} days" ;}
+
+
+
+
   switch (item.status) {
     case "Paid":
       return
         Wrap(
           children: [
 
-            Text("Paid on "),
+            Text("Paid on ",
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  color: Color(0xff1AC5A6),
+                  fontWeight: FontWeight.bold,
+                )),
             Text(DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(item.payDate))),
             Text(",   "),
- //           Text("\t "),
+            //           Text("\t "),
 
             Text("Amount paid "),
-            Text("${formatCurrency.format(item.payAmount)}"),
+            Text("${formatCurrency.format(item.payAmount)}",
+                style: TextStyle(
+                  color: Color(0xff1AC5A6),
+                  fontWeight: FontWeight.bold,
+                )
+            ),
           ],
         );
       break;
@@ -275,29 +386,42 @@ detailInfo(TransBill item) {
         Wrap(
           children: [
             Text("Due : ${DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(item.dueDate))},  "),
-            Text("(${(DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays} "
-                "days) "),
+            //          Text("(${(DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays} "
+
+            Text("($daysLeftShow)",
+              style: TextStyle(
+                fontFamily: 'Roboto',
+                color: getColor(daysLeft),
+                fontWeight: FontWeight.bold,
+//                fontSize: 20.0,
+              ),
+            ),
             Text("Amount "),
             Text(r"$"),
-            Text(" ${oCcy.format(item.dueAmount)}"),
+            Text(" ${oCcy.format(item.dueAmount)}",
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.bold,
+                )),
           ],
         );
 
-    }
+  }
 
 }
 
 getIcon(context, String status, TransBill item, String billName) {
 
+  int daysLeft = (DateTime.parse(item.dueDate)).difference(DateTime.now()).inDays;
   switch (status) {
     case "Paid":
       return Icon(Icons.check_circle,
-      color: Colors.teal,);
+          color: Color(0xff1AC5A6));
       break;
     case "Partial":
       return IconButton(
           icon: Icon(Icons.invert_colors),
-          color: Colors.deepOrange,
+          color: getColor(daysLeft),
           onPressed: () {
             Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => TransactUpdate(item, billName)));
@@ -308,13 +432,21 @@ getIcon(context, String status, TransBill item, String billName) {
     default:
       return IconButton(
           icon: Icon(Icons.update),
-          color: Colors.deepOrange,
+          color: getColor(daysLeft),
           onPressed: () {
-              Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => TransactUpdate(item, billName)));
+            Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => TransactUpdate(item, billName)));
           }
       );
   }
+}
+
+Color getColor (int daysLeft) {
+  int _daysLeft = daysLeft;
+  if  (daysLeft > 0) {
+    return Colors.lightBlue;
+  }
+  else return Colors.deepOrange;
 }
 
 

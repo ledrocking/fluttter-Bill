@@ -60,6 +60,18 @@ class DatabaseHelper {
       '''
     );
 
+    //Create Initial Category
+    MyCategory initCat, initCat2  = MyCategory();
+    initCat.name = "Home Utilities";
+    initCat.icon = "";
+
+    initCat2.name = "Credit Card";
+    initCat2.icon = "";
+
+    await insertMyCategory(initCat);
+    await insertMyCategory(initCat2);
+
+
     //create Tables Transaction
     await db.execute('''
       CREATE TABLE ${Transact.tblTransact}(
@@ -75,6 +87,7 @@ class DatabaseHelper {
       )
       '''
     );
+
 
     //Create Table Setting
     await db.execute('''
@@ -238,12 +251,41 @@ class DatabaseHelper {
         where: '${Transact.colTID}=?', whereArgs: [tID]);
   }
 
-  //transact - delete all transaction for certain bill (when bill is deleted)
+  //transact - delete all transaction for certain bill (when a bill is deleted)
   Future<int> deleteTransBill(int billID) async {
     Database db = await database;
     return await db.delete(Transact.tblTransact,
         where: '${Transact.colBillID}=?', whereArgs: [billID]);
   }
+
+  //transact - delete all transaction for certain bill (when a bill end date is changed)
+  // for date > now
+  Future deleteTransBillOnward(int billID, String endDate) async {
+    Database db = await database;
+    int _billID = billID;
+    String _endDate = endDate;
+    String _date1 = DateFormat('yyyy-MM-dd').format(DateTime.parse(DateTime.now().toString()));
+    String _date2 = DateFormat('yyyy-MM-dd').format(DateTime.parse(_endDate));
+    return await db.execute(
+      '''
+      DELETE FROM ${Transact.tblTransact}
+      WHERE ${Transact.colBillID} = $_billID AND
+      ${Transact.colDueDate} BETWEEN  DATE('$_date1') AND DATE('$_date2')
+          
+      '''
+    );
+  }
+
+
+  /*Future<int> deleteTransBillOnward(int billID) async {
+    Database db = await database;
+    return await db.delete(Transact.tblTransact,
+        where: '${Transact.colBillID}=? and ${Transact.colDueDate}>=?',
+        whereArgs: [billID, DateTime.now()]);
+  }
+  */
+
+
 
   //transact - retrieve all
   Future<List<Transact>> fetchTransacts() async {
@@ -348,4 +390,34 @@ class DatabaseHelper {
     }
     return myList;
   }
+
+
+  // SELECT GET SUMMARY JOIN TABLE TRANSACT & BILL
+  //List<Map> sumData =[];
+  Future<List<Map>> transSum(period) async {
+    String _period = period;
+    String myPeriod = DateTime.now().toString();
+
+
+    Database db = await database;
+    String _date = DateFormat('yyyy-MM-dd').format(DateTime.parse(_period));
+    String _myDue = Transact.colDueDate;
+
+    List<Map> sumData  = await db.rawQuery(
+        '''
+        SELECT SUM(${Transact.colDueAmount}),  SUM(${Transact.colPayAmount})
+        
+        FROM ${Transact.tblTransact} 
+        WHERE $_myDue BETWEEN  DATE('$_date','start of month','+0 month','-0 day') 
+        AND DATE('$_date','start of month','+1 month','-0 day')
+        
+        '''
+    );
+
+    if (sumData ==null){
+      debugPrint("No Data from join");
+    }
+    return sumData;
+  }
+
 }

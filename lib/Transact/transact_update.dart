@@ -1,19 +1,26 @@
 
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:bill_reminder/Transact/transList.dart';
 import 'package:bill_reminder/Transact/transbill_class.dart';
 import 'file:///C:/Users/adel.rahadi/FlutterProjects/bill_reminder/lib/component/NavDrawer.dart';
 import 'package:bill_reminder/category/category_class.dart';
 import 'package:bill_reminder/category/category_list.dart';
 import 'package:bill_reminder/component/my_header.dart';
+import 'package:bill_reminder/upload/utility.dart';
 import 'package:flutter/material.dart';
 import 'package:bill_reminder/database/database_helper.dart';
 import 'dart:io';
 import 'package:bill_reminder/bill/bill_data_class.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart';
+import 'package:bill_reminder/upload/photo_class.dart';
 
 import 'transact_class.dart';
 import 'transact_class.dart';
+import 'package:image_picker/image_picker.dart';
 
 
 const darkBlueColor = Color(0xff486579);
@@ -56,10 +63,6 @@ class _TransactUpdateState extends State<TransactUpdate> {
 
       if (this._transBill != null){
         _ctrlPayAmount.text = _transBill.dueAmount.toString();
-        _ctrlPayNote.text = _transBill.billName.toString();
-        _ctrlPayImage.text = _transBill.billID.toString();
-
-
       }
     });
   }
@@ -70,160 +73,175 @@ class _TransactUpdateState extends State<TransactUpdate> {
   }
 
 
-  _form() => Column(
-    children: [
-      Container(
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-        child:Column(
-          children: <Widget>[
-            SizedBox(height: 30,),
-            Text(_transBill.billName,
+  _form() => Expanded(
+    child: Container(
+      padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+      child: ListView(
+        children: [
+          Center(
+            child: Text(_transBill.billName,
                 style: TextStyle(
                   fontFamily: 'Roboto',
                   color: Colors.deepOrange,
                   fontWeight: FontWeight.bold,
                   fontSize: 20.0,
                 )),
-            Container(
-              margin: EdgeInsets.all(10.0),
-              decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  border: Border.all(
-                  color: Color(0xff1AC5A6),
-                  width: 1.0,
-                ),
+          ),
+          Container(
+            margin: EdgeInsets.all(10.0),
+            decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                border: Border.all(
+                color: Color(0xff1AC5A6),
+                width: 1.0,
               ),
-
-              child: Column(
-                children: [
-                  SizedBox(height: 20,),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Due Amount :  ",
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            color: Color(0xff1AC5A6),
-                            fontSize: 16.0,
-                          )),
-                      Text("${_transBill.dueAmount.toString()}",
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black54,
-                            fontSize: 16.0,
-                          )),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Due Date :  ",
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            color: Color(0xff1AC5A6),
-                            fontSize: 16.0,
-                          )),
-                      Text("${DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(_transBill.dueDate))}",
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black54,
-                            fontSize: 16.0,
-                          )),
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text("Status :  ",
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            color: Color(0xff1AC5A6),
-                            fontSize: 16.0,
-                          )),
-                      Text("${_transBill.status}",
-                          style: TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black54,
-                            fontSize: 16.0,
-                          )),
-                    ],
-                  ),
-                  SizedBox(height: 20,),
-
-                ],
-              ),
-
             ),
 
-            SizedBox(height: 10,),
-
-
-
-          ],
-        ),
-
-      ),
-      Container(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-        child: Expanded(
-          child: Form(
-            key: _formKey,
             child: Column(
-              children: <Widget>[
-
-                TextFormField(
-                  controller: _ctrlPayAmount,
-                  decoration: InputDecoration(labelText: "Pay Amount"),
-                  onSaved: (val) => setState(() => _updateData.payAmount = double.parse(val)),
-                  validator: (val) =>
-                  (val.length == 0 ? 'This field is required' : null),
+              children: [
+                SizedBox(height: 20,),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Due Amount :  ",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          color: Color(0xff1AC5A6),
+                          fontSize: 16.0,
+                        )),
+                    Text("${_transBill.dueAmount.toString()}",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16.0,
+                        )),
+                  ],
                 ),
-
-                TextFormField(
-                  controller: _ctrlPayNote,
-                  decoration: InputDecoration(labelText: "Payment Note"),
-                  onSaved: (val) => setState(() => _updateData.payNote),
-                  validator: (val) =>
-                  (val.length == 0 ? 'This field is required' : null),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Due Date :  ",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          color: Color(0xff1AC5A6),
+                          fontSize: 16.0,
+                        )),
+                    Text("${DateFormat('EEE, MMM d, ''yy').format(DateTime.parse(_transBill.dueDate))}",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16.0,
+                        )),
+                  ],
                 ),
-
-                TextFormField(
-                  controller: _ctrlPayImage,
-                  decoration: InputDecoration(labelText: "Payment Image"),
-                  onSaved: (val) => setState(() => _updateData.payImage),
-                  validator: (val) =>
-                  (val.length == 0 ? 'This field is required' : null),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text("Status :  ",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          color: Color(0xff1AC5A6),
+                          fontSize: 16.0,
+                        )),
+                    Text("${_transBill.status}",
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                          fontSize: 16.0,
+                        )),
+                  ],
                 ),
-
-
-                SizedBox(height: 30,),
-                Container(
-                  margin: EdgeInsets.all(10.0),
-                  width: 200.0,
-                  height: 50.0,
-                  child: RaisedButton(
-                    shape: StadiumBorder(),
-
-
-                    onPressed: () => _onSubmit(),
-                    child: Text("Save",
-                        style: TextStyle(fontSize: 20)),
-                    color: Color(0xff1AC5A6),
-                    textColor: Colors.white,
-                  ),
-                ),
+                SizedBox(height: 20,),
 
               ],
             ),
+
           ),
-        ),
+
+          SizedBox(height: 10,),
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+
+                  TextFormField(
+                    controller: _ctrlPayAmount,
+                    decoration: InputDecoration(labelText: "Pay Amount"),
+                    onSaved: (val) => setState(() => _updateData.payAmount = double.parse(val)),
+                    validator: (val) =>
+                    (val.length == 0 ? 'This field is required' : null),
+                  ),
+
+                  TextFormField(
+                    controller: _ctrlPayNote,
+                    decoration: InputDecoration(labelText: "Payment Note"),
+                    onSaved: (val) => setState(() => _updateData.payNote),
+                    validator: (val) =>
+                    (val.length == 0 ? 'This field is required' : null),
+                  ),
+
+                  TextFormField(
+                    controller: _ctrlPayImage,
+                    decoration: InputDecoration(labelText: "Payment Image"),
+                    onSaved: (val) => setState(() => _updateData.payImage),
+                    validator: (val) =>
+                    (val.length == 0 ? 'This field is required' : null),
+                  ),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Flexible(
+                        flex: 7,
+                        child: TextFormField(
+                          controller: _ctrlPayImage,
+                          readOnly: true,
+                          decoration: InputDecoration(labelText: "Select Image to Upload"),
+                          onSaved: (val) => setState(() => _updateData.payImage),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: IconButton(
+                          icon: Icon(Icons.image),
+                          onPressed: () => pickImageFromGallery(),
+                          color: Color(0xffF15411),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 30,),
+                  Container(
+                    margin: EdgeInsets.all(10.0),
+                    width: 200.0,
+                    height: 50.0,
+                    child: RaisedButton(
+                      shape: StadiumBorder(),
+
+
+                      onPressed: () => _onSubmit(),
+                      child: Text("Save",
+                          style: TextStyle(fontSize: 20)),
+                      color: Color(0xff1AC5A6),
+                      textColor: Colors.white,
+                    ),
+                  ),
+
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
-    ],
+    ),
   );
 
   _onSubmit() async {
@@ -278,4 +296,15 @@ class _TransactUpdateState extends State<TransactUpdate> {
     }
   }
 
+  Future<File> imageFile;
+  Image image;
+
+  pickImageFromGallery() {
+    ImagePicker.pickImage(source: ImageSource.gallery).then((imgFile) {
+      String imgString = Utility.base64String(imgFile.readAsBytesSync());
+      /*TransBill.colPayImage photo = Photo(0, imgString);
+      dbHelper.save(photo);
+      refreshImages();*/
+    });
+  }
 }

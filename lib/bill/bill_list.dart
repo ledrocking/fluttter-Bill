@@ -99,8 +99,6 @@ class _BillListState extends State<BillList> {
                     }),
 
                 onTap: (){
-
-                  debugPrint('One bill is clicked');
                   Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => BillDetail(_bills[index], _bills[index].name)
                     ),
